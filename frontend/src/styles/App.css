@@ -12,3 +12,57 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
   monospace;
 }
+
+.btn {
+  padding: 15px;
+  height: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  text-align: center;
+  transition: all .5s ease;
+  cursor: pointer;
+}
+
+.btn--action {
+  display: block;
+  padding: 1.2rem 2rem;
+  border-radius: 1.5rem;
+  background-color: #ff842d;
+  color: white;
+  transition: all .5s ease 0s;
+  box-shadow: 0 5px #ffa15a;
+}
+
+.btn--action span {
+  display: inline-block;
+  position: relative;
+  top: -12px;
+  transition: all .5s ease;
+}
+
+.btn--action span:before {
+  content: "+";
+  color: white;
+  font-size: 1.3rem;
+  display: inline-block;
+  position: absolute;
+  top: -4px;
+  right: 1.5rem;
+  opacity: 0;
+  transition: all .1s ease 0s;
+}
+
+.btn--action:hover span {
+  padding-right: 1.5rem;
+}
+
+.btn--action:hover span:before {
+  right: 0;
+  opacity: 1;
+}
+
+.btn--action:active {
+  box-shadow: 0 5px #f0932b;
+  transform: translateY(5px);
+}

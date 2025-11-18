@@ -24,7 +24,7 @@ const AuthPage = () => {
                     behavior: "smooth",
                     block: "center",
                     inline: "center"
-                }} ref={ref} className={"flex items-center flex-col w-full"} tabIndex={0} onFinish={onAuth}
+                }} ref={ref} className={"flex items-center flex-col w-full"} onFinish={onAuth}
                       layout={"vertical"}>
                     <Form.Item className={"w-full"}
                                name={"user_login"}
@@ -45,7 +45,7 @@ const AuthPage = () => {
                                hasFeedback
                                rules={[
                                    {required: true, message: "Пароль не может быть пустым"},
-                                   {min: 5, message: "Пароль не может быть короче 5 символов"}
+                                   {min: 8, message: "Пароль не может быть короче 8 символов"}
                                ]}>
                         <Input.Password autoFocus onPressEnter={() => {
                             if (ref.current) {

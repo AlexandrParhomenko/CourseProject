@@ -22,7 +22,7 @@ const SetRolesModal: FC<Props> = ({isShow, onClose, type}) => {
                     behavior: "smooth",
                     block: "center",
                     inline: "center"
-                }} className={"flex items-center flex-col w-full"} tabIndex={0} onFinish={onSubmit}
+                }} className={"flex items-center flex-col w-full"} onFinish={onSubmit}
                       layout={"vertical"}>
                     <Form.Item className={"w-full"}
                                name={"user_login"}
