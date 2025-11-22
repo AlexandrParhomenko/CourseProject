@@ -4,10 +4,10 @@ import {RiFileList3Line} from "react-icons/ri";
 import {useState} from "react";
 import AddUserModal from "./AddUserModal.tsx";
 import SetRolesModal from "./SetRolesModal.tsx";
-import type {ModalType} from "@types/types.ts";
 import {useNavigate} from "react-router-dom";
 import routes from "../../router/routes.ts";
 import ContractsModal from "../JournalListsPage/ContractsModal.tsx";
+import type {ModalType} from "@/types/types.ts";
 
 const MainPage = () => {
     document.title = "Главная";
@@ -81,10 +81,10 @@ const MainPage = () => {
             </div>
         </div>
         <MenuItem onClick={() => navigate(routes.supervision_journal)} title={"Электронный журнал авторского надзора"}/>
-        <MenuItem onClick={() => navigate(routes.object_workers_list)} title={"Реестр ИТД"}/>
-        <MenuItem onClick={() => navigate(routes.object_workers_list)} title={"Реестр технических решений"}/>
+        <MenuItem onClick={() => navigate(routes.itd_registry)} title={"Реестр ИТД"}/>
+        <MenuItem onClick={() => navigate(routes.solutions_registry)} title={"Реестр технических решений"}/>
         <MenuItem onClick={() => navigate(routes.object_workers_list)} title={"Список лиц на объекте"}/>
-        <MenuItem onClick={() => navigate(routes.object_workers_list)} title={"Консультации на объекте"}/>
+        <MenuItem onClick={() => navigate(routes.consultations)} title={"Консультации на объекте"}/>
         <MenuItem onClick={() => navigate(routes.journal_lists)} title={"Списки для заполнения"}/>
     </Flex>
 };

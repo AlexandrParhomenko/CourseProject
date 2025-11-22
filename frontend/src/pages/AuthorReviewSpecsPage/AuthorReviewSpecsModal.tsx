@@ -1,4 +1,4 @@
-import {Button, Form, Input, Modal, Select} from "antd";
+import {Button, DatePicker, Form, Input, Modal, Select} from "antd";
 import type {FC} from "react";
 import type {ModalType} from "@typings/types.ts";
 
@@ -8,7 +8,7 @@ interface IProps {
     type: ModalType
 }
 
-const OrganisationsModal: FC<IProps> = ({isShow, onClose, type}) => {
+const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
     const onSubmit = () => {
 
     }
@@ -16,7 +16,7 @@ const OrganisationsModal: FC<IProps> = ({isShow, onClose, type}) => {
     return (
         <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={() => onClose()} open={isShow}>
             <div className={"flex items-center flex-col justify-center"}>
-                <span className={"font-bold"}>Запись реестра организаций</span>
+                <span className={"font-bold"}>Запись реестра специалистов авторского надзора</span>
                 <Form scrollToFirstError={{
                     behavior: "smooth",
                     block: "center",
@@ -29,58 +29,74 @@ const OrganisationsModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <Input placeholder={"Введите номер договора"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"project_participant"}
+                                   name={"fio"}
                                    rules={[
                                        {
                                            required: true,
-                                           message: "Выберите участника проекта"
+                                           message: "Введите ФИО"
                                        }
                                    ]}
-                                   label={"Участник проекта"}>
-                            <Select placeholder={"Выберите участника проекта"}></Select>
-                        </Form.Item>
-                        <Form.Item className={"w-full"}
-                                   name={"organisation"}
-                                   rules={[
-                                       {
-                                           required: true,
-                                           message: "Введите организацию"
-                                       }
-                                   ]}
-                                   label={"Организация"}>
-                            <Input placeholder={"Введите организацию"}/>
-                        </Form.Item>
-                        <Form.Item className={"w-full"}
-                                   name={"contact_fio"}
-                                   rules={[
-                                       {
-                                           required: true,
-                                           message: "Введите ФИО контактного лица"
-                                       }
-                                   ]}
-                                   label={"ФИО контактного лица"}>
-                            <Input placeholder={"Введите ФИО контактного лица"}/>
+                                   label={"ФИО"}>
+                            <Input placeholder={"Введите ФИО"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
                                    name={"position"}
                                    rules={[
                                        {
                                            required: true,
-                                           message: "Введите должность"
+                                           message: "Выберите должность"
                                        }
                                    ]}
                                    label={"Должность"}>
-                            <Input placeholder={"Введите должность"}/>
+                            <Select placeholder={"Выберите должность"}></Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"department"}
-                                   label={"Подразделение"}>
-                            <Input placeholder={"Введите подразделение"}/>
+                                   name={"phone"}
+                                   rules={[
+                                       {
+                                           required: true,
+                                           message: "Введите номер телефона"
+                                       }
+                                   ]}
+                                   label={"Номер телефона"}>
+                            <Input placeholder={"Введите номер телефона"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"contact_number"}
-                                   label={"Контактный номер"}>
-                            <Input placeholder={"Введите контактный номер"}/>
+                                   name={"work_type"}
+                                   rules={[
+                                       {
+                                           required: true,
+                                           message: "Выберите вид работы"
+                                       }
+                                   ]}
+                                   label={"Вид работы, по которой осуществляется авторский надзор"}>
+                            <Select 
+                                mode="multiple"
+                                placeholder={"Выберите вид работы"}
+                                allowClear>
+                            </Select>
+                        </Form.Item>
+                        <Form.Item className={"w-full"}
+                                   name={"order_number"}
+                                   rules={[
+                                       {
+                                           required: true,
+                                           message: "Введите номер документа Приказ №"
+                                       }
+                                   ]}
+                                   label={"Номер документа Приказ №____"}>
+                            <Input placeholder={"Введите номер приказа"}/>
+                        </Form.Item>
+                        <Form.Item className={"w-full"}
+                                   name={"order_date"}
+                                   rules={[
+                                       {
+                                           required: true,
+                                           message: "Введите дату документа о полномочиях"
+                                       }
+                                   ]}
+                                   label={"Дата документа о полномочиях. Приказ от ______"}>
+                            <DatePicker className={"w-full"} format={"DD.MM.YYYY"}/>
                         </Form.Item>
                     </div>
                     <Form.Item>
@@ -95,8 +111,5 @@ const OrganisationsModal: FC<IProps> = ({isShow, onClose, type}) => {
     );
 };
 
-export default OrganisationsModal;
-
-
-
+export default AuthorReviewSpecsModal;
 

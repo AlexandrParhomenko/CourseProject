@@ -2,21 +2,22 @@ import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import type {ModalType} from "@typings/types.ts";
 import {useForm} from "antd/es/form/Form";
-import {Button, Flex, Form, Input, Popover, Select, Table, Tooltip} from "antd";
+import {Button, DatePicker, Flex, Form, Input, Popover, Table, Tooltip} from "antd";
 import BackBtn from "@components/BackBtn/BackBtn.tsx";
 import routes from "@router/routes.ts";
 import TableHeader from "@components/TableHeader/TableHeader.tsx";
 import {FaFilter} from "react-icons/fa";
 import type {ColumnType} from "antd/es/table";
-import OrganisationsModal from "@pages/OrganisationsPage/OrganisationsModal.tsx";
+import RegVisitListModal from "@pages/RegVisitListPage/RegVisitListModal.tsx";
 
-const OrganisationsPage = () => {
-    document.title = "Реестр организаций";
+const RegVisitListPage = () => {
+    document.title = "Регистрационный лист посещения объекта";
     const navigate = useNavigate();
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
     const [openFilter, setOpenFilter] = useState<boolean>(false);
     const [form] = useForm()
+    const {RangePicker} = DatePicker;
 
     const columns: ColumnType<any>[] = [
         {
@@ -28,39 +29,27 @@ const OrganisationsPage = () => {
         },
         {
             align: "center",
-            title: 'Участники проекта',
-            dataIndex: 'project_participant',
-            key: 'project_participant',
+            title: 'ФИО',
+            dataIndex: 'fio',
+            key: 'fio',
         },
         {
             align: "center",
-            title: 'Организация',
-            dataIndex: 'organisation',
-            key: 'organisation',
+            title: 'Дата приезда',
+            dataIndex: 'arrival_date',
+            key: 'arrival_date',
         },
         {
             align: "center",
-            title: 'ФИО контактного лица',
-            dataIndex: 'contact_fio',
-            key: 'contact_fio',
+            title: 'Дата отъезда',
+            dataIndex: 'departure_date',
+            key: 'departure_date',
         },
         {
             align: "center",
-            title: 'Должность',
-            dataIndex: 'position',
-            key: 'position',
-        },
-        {
-            align: "center",
-            title: 'Подразделение',
-            dataIndex: 'department',
-            key: 'department',
-        },
-        {
-            align: "center",
-            title: 'Контактный номер',
-            dataIndex: 'contact_number',
-            key: 'contact_number',
+            title: 'Контактирующие лица',
+            dataIndex: 'contact_persons',
+            key: 'contact_persons',
         },
     ]
 
@@ -85,17 +74,14 @@ const OrganisationsPage = () => {
             }} onFinish={() => {
             }} layout="vertical" className="flex items-center flex-col gap-1">
                 <div className={"w-[400px]"}>
-                    <Form.Item name={"project_participant"} label={"Участники проекта"}>
-                        <Input allowClear placeholder={"Участники проекта"}/>
+                    <Form.Item name={"fio"} label={"ФИО"}>
+                        <Input allowClear placeholder={"ФИО"}/>
                     </Form.Item>
-                    <Form.Item name={"organisation"} label={"Организация"}>
-                        <Input allowClear placeholder={"Организация"}/>
+                    <Form.Item name={"arrival_date"} label={"Дата приезда"}>
+                        <RangePicker className={"w-full"} format={"DD.MM.YYYY"}/>
                     </Form.Item>
-                    <Form.Item name={"contact_fio"} label={"ФИО контактного лица"}>
-                        <Input allowClear placeholder={"ФИО контактного лица"}/>
-                    </Form.Item>
-                    <Form.Item name={"position"} label={"Должность"}>
-                        <Input allowClear placeholder={"Должность"}/>
+                    <Form.Item name={"departure_date"} label={"Дата отъезда"}>
+                        <RangePicker className={"w-full"} format={"DD.MM.YYYY"}/>
                     </Form.Item>
                 </div>
                 <Form.Item>
@@ -113,7 +99,7 @@ const OrganisationsPage = () => {
         <Flex vertical align={"center"} gap={20} className={"h-screen w-full"}>
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.object_workers_list)}/>
-                <span className={"font-bold"}>Реестр организаций</span>
+                <span className={"font-bold"}>Регистрационный лист посещения объекта</span>
                 <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
             </div>
             <div className={"w-full p-6"}>
@@ -139,7 +125,7 @@ const OrganisationsPage = () => {
                                  </Tooltip>
                              </Popover>}
                              deleteFuncError={false}
-                             children={<OrganisationsModal type={modalType}
+                             children={<RegVisitListModal type={modalType}
                                                                 onClose={() => setJournalModalOpen(false)}
                                                                 isShow={JournalModalOpen}/>}
                              deleteEntity={"объект"}/>
@@ -165,8 +151,5 @@ const OrganisationsPage = () => {
     );
 };
 
-export default OrganisationsPage;
-
-
-
+export default RegVisitListPage;
 

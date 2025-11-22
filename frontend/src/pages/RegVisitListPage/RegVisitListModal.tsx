@@ -1,4 +1,4 @@
-import {Button, DatePicker, Form, Input, Modal} from "antd";
+import {Button, DatePicker, Form, Input, Modal, Select} from "antd";
 import type {FC} from "react";
 import type {ModalType} from "@typings/types.ts";
 
@@ -8,7 +8,7 @@ interface IProps {
     type: ModalType
 }
 
-const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
+const RegVisitListModal: FC<IProps> = ({isShow, onClose}) => {
     const onSubmit = () => {
 
     }
@@ -16,50 +16,60 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
     return (
         <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={() => onClose()} open={isShow}>
             <div className={"flex items-center flex-col justify-center"}>
-                <span className={"font-bold"}>Запись реестра консультаций</span>
+                <span className={"font-bold"}>Запись регистрационного листа посещения объекта</span>
                 <Form scrollToFirstError={{
                     behavior: "smooth",
                     block: "center",
                     inline: "center"
                 }} className={"flex items-center flex-col w-full"} onFinish={onSubmit} layout={"vertical"}>
-                    <div style={{height: "50vh"}} className={"overflow-y-auto w-full"}>
+                    <div className={"overflow-y-auto w-full"}>
                         <Form.Item className={"w-full"}
-                                   name={"contract_number"}
-                                   label={"Номер договора"}>
-                            <Input placeholder={"Введите номер договора"}/>
-                        </Form.Item>
-                        <Form.Item className={"w-full"}
-                                   name={"date"}
+                                   name={"fio"}
                                    rules={[
                                        {
                                            required: true,
-                                           message: "Введите дату"
+                                           message: "Введите ФИО"
                                        }
                                    ]}
-                                   label={"Дата"}>
+                                   label={"ФИО"}>
+                            <Input placeholder={"Введите ФИО"}/>
+                        </Form.Item>
+                        <Form.Item className={"w-full"}
+                                   name={"arrival_date"}
+                                   rules={[
+                                       {
+                                           required: true,
+                                           message: "Введите дату приезда"
+                                       }
+                                   ]}
+                                   label={"Дата приезда"}>
                             <DatePicker className={"w-full"} format={"DD.MM.YYYY"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"appeal_content"}
+                                   name={"departure_date"}
                                    rules={[
                                        {
                                            required: true,
-                                           message: "Введите содержание обращения"
+                                           message: "Введите дату отъезда"
                                        }
                                    ]}
-                                   label={"Содержание обращения"}>
-                            <Input.TextArea rows={4} placeholder={"Введите содержание обращения"}/>
+                                   label={"Дата отъезда"}>
+                            <DatePicker className={"w-full"} format={"DD.MM.YYYY"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"review_result"}
+                                   name={"contact_persons"}
                                    rules={[
                                        {
                                            required: true,
-                                           message: "Введите результат рассмотрения"
+                                           message: "Выберите контактирующие лица"
                                        }
                                    ]}
-                                   label={"Результат рассмотрения"}>
-                            <Input.TextArea rows={4} placeholder={"Введите результат рассмотрения"}/>
+                                   label={"Контактирующие лица"}>
+                            <Select 
+                                mode="multiple"
+                                placeholder={"Выберите контактирующие лица"}
+                                allowClear>
+                            </Select>
                         </Form.Item>
                     </div>
                     <Form.Item>
@@ -74,8 +84,5 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
     );
 };
 
-export default ConsultationsModal;
-
-
-
+export default RegVisitListModal;
 

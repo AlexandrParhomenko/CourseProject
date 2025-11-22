@@ -1,6 +1,6 @@
 import {Button, DatePicker, Form, Input, Modal, Select} from "antd";
 import type {FC} from "react";
-import type {ICreateUser, ModalType} from "../../types/types.ts";
+import type {User, ModalType} from "../../types/types.ts";
 
 interface Props {
     isShow: boolean
@@ -10,7 +10,7 @@ interface Props {
 
 const SetRolesModal: FC<Props> = ({isShow, onClose, type}) => {
     const { RangePicker } = DatePicker;
-    const onSubmit = (values: ICreateUser) => {
+    const onSubmit = (values: User) => {
         console.log(values)
     }
 

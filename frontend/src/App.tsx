@@ -20,31 +20,44 @@ import AuthorReviewSpecsPage from "@pages/AuthorReviewSpecsPage/AuthorReviewSpec
 import RegVisitListPage from "@pages/RegVisitListPage/RegVisitListPage.tsx";
 import OrganisationsPage from "@pages/OrganisationsPage/OrganisationsPage.tsx";
 import ConsultationsPage from "@pages/ConsultationsPage/ConsultationsPage.tsx";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: 1,
+            staleTime: 5 * 60 * 1000, // 5 минут
+        },
+    },
+});
 
 function App() {
 
     return (
-        <Routes>
-            <Route index element={<AuthPage/>}/>
-            <Route path={routes.main} element={<MainPage/>}/>
-            <Route path={routes.object_workers_list} element={<ObjectWorkersList/>}/>
-            <Route path={routes.journal_lists} element={<JournalListsPage/>}/>
-            <Route path={routes.building_objects} element={<BuildingObjectsPage/>}/>
-            <Route path={routes.markings_short_names} element={<MarkingsShortNamesPage/>}/>
-            <Route path={routes.discipline_short_names} element={<DisciplineShortNamesPage/>}/>
-            <Route path={routes.srd_by_block} element={<SRDByBlockPage/>}/>
-            <Route path={routes.srd_marking} element={<SRDMarkingPage/>}/>
-            <Route path={routes.doc_types} element={<DocTypesPage/>}/>
-            <Route path={routes.work_types} element={<WorkTypesPage/>}/>
-            <Route path={routes.retreats_importance} element={<RetreatsImportancePage/>}/>
-            <Route path={routes.supervision_journal} element={<SupervisionJournalPage/>}/>
-            <Route path={routes.itd_registry} element={<ITDRegistryPage/>}/>
-            <Route path={routes.solutions_registry} element={<SolutionsRegistryPage/>}/>
-            <Route path={routes.author_review_specs} element={<AuthorReviewSpecsPage/>}/>
-            <Route path={routes.reg_visit_list} element={<RegVisitListPage/>}/>
-            <Route path={routes.organisations} element={<OrganisationsPage/>}/>
-            <Route path={routes.consultations} element={<ConsultationsPage/>}/>
-        </Routes>
+        <QueryClientProvider client={queryClient}>
+            <Routes>
+                <Route index element={<AuthPage/>}/>
+                <Route path={routes.main} element={<MainPage/>}/>
+                <Route path={routes.object_workers_list} element={<ObjectWorkersList/>}/>
+                <Route path={routes.journal_lists} element={<JournalListsPage/>}/>
+                <Route path={routes.building_objects} element={<BuildingObjectsPage/>}/>
+                <Route path={routes.markings_short_names} element={<MarkingsShortNamesPage/>}/>
+                <Route path={routes.discipline_short_names} element={<DisciplineShortNamesPage/>}/>
+                <Route path={routes.srd_by_block} element={<SRDByBlockPage/>}/>
+                <Route path={routes.srd_marking} element={<SRDMarkingPage/>}/>
+                <Route path={routes.doc_types} element={<DocTypesPage/>}/>
+                <Route path={routes.work_types} element={<WorkTypesPage/>}/>
+                <Route path={routes.retreats_importance} element={<RetreatsImportancePage/>}/>
+                <Route path={routes.supervision_journal} element={<SupervisionJournalPage/>}/>
+                <Route path={routes.itd_registry} element={<ITDRegistryPage/>}/>
+                <Route path={routes.solutions_registry} element={<SolutionsRegistryPage/>}/>
+                <Route path={routes.author_review_specs} element={<AuthorReviewSpecsPage/>}/>
+                <Route path={routes.reg_visit_list} element={<RegVisitListPage/>}/>
+                <Route path={routes.organisations} element={<OrganisationsPage/>}/>
+                <Route path={routes.consultations} element={<ConsultationsPage/>}/>
+            </Routes>
+        </QueryClientProvider>
     )
 }
 
