@@ -9,6 +9,7 @@ import TableHeader from "@components/TableHeader/TableHeader.tsx";
 import {FaFilter} from "react-icons/fa";
 import {itdRegistry} from "@/constants/table_columns/table_columns.tsx";
 import IDTRegistryModal from "@pages/ITDRegustryPage/IDTRegistryModal.tsx";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const ItdRegistryPage = () => {
     document.title = "Реестр подписанной ИТД в рамках АН по договору number_contract";
@@ -69,7 +70,7 @@ const ItdRegistryPage = () => {
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.main)}/>
                 <span className={"font-bold"}>Реестр подписанной ИТД в рамках АН по договору number_contract</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => {

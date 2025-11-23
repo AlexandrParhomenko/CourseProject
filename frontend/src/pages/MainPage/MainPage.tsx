@@ -8,6 +8,7 @@ import {useNavigate} from "react-router-dom";
 import routes from "../../router/routes.ts";
 import ContractsModal from "../JournalListsPage/ContractsModal.tsx";
 import type {ModalType} from "@/types/types.ts";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const MainPage = () => {
     document.title = "Главная";
@@ -26,7 +27,7 @@ const MainPage = () => {
         <div className={"flex justify-between w-full p-6 mb-20"}>
             <div></div>
             <span className={"font-bold"}>Главная</span>
-            <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+            <ExitBtn/>
         </div>
         <div className={"flex align-center gap-3"}>
             <Popover placement={"bottom"} trigger={"click"} content={<div className={"flex flex-col text-center gap-3"}>

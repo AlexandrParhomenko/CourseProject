@@ -3,6 +3,7 @@ import routes from "../../router/routes.ts";
 import MenuItem from "../MainPage/MenuItem.tsx";
 import {Flex} from "antd";
 import {useNavigate} from "react-router-dom";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const JournalListsPage = () => {
     document.title = "Списки для заполнения";
@@ -13,7 +14,7 @@ const JournalListsPage = () => {
             <div className={"flex justify-between w-full p-6 mb-20"}>
                 <BackBtn onClick={() => navigate(routes.main)}/>
                 <span className={"font-bold"}>Списки для заполнения</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                <ExitBtn/>
             </div>
             <MenuItem onClick={() => navigate(routes.building_objects)} title={"Объекты строительства"}/>
             <MenuItem onClick={() => navigate(routes.markings_short_names)} title={"Сокращенное наименование марок"}/>

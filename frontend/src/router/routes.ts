@@ -17,6 +17,6 @@ export default {
   reg_visit_list: "/regvisitlist",
   organisations: "/organisations",
   consultations: "/consultations",
-  auth: "/auth",
+  auth: "/",
   notFound: "/404",
 };

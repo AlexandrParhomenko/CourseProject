@@ -86,3 +86,5 @@ const RegVisitListModal: FC<IProps> = ({isShow, onClose}) => {
 
 export default RegVisitListModal;
 
+
+

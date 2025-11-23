@@ -9,6 +9,7 @@ import TableHeader from "@components/TableHeader/TableHeader.tsx";
 import {FaFilter} from "react-icons/fa";
 import type {ColumnType} from "antd/es/table";
 import OrganisationsModal from "@pages/OrganisationsPage/OrganisationsModal.tsx";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const OrganisationsPage = () => {
     document.title = "Реестр организаций";
@@ -114,7 +115,7 @@ const OrganisationsPage = () => {
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.object_workers_list)}/>
                 <span className={"font-bold"}>Реестр организаций</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => {
@@ -166,6 +167,8 @@ const OrganisationsPage = () => {
 };
 
 export default OrganisationsPage;
+
+
 
 
 

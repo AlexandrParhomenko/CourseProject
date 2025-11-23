@@ -6,6 +6,7 @@ import BackBtn from "../../components/BackBtn/BackBtn.tsx";
 import routes from "../../router/routes.ts";
 import TableHeader from "../../components/TableHeader/TableHeader.tsx";
 import CreateMarkingModal from "./CreateMarkingModal.tsx";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const MarkingsShortNamesPage = () => {
     document.title = "Сокращенное наименование марок";
@@ -54,7 +55,7 @@ const MarkingsShortNamesPage = () => {
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.journal_lists)}/>
                 <span className={"font-bold"}>Сокращенное наименование марок</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => setIsCreateMarking(true)}

@@ -9,6 +9,7 @@ import TableHeader from "@components/TableHeader/TableHeader.tsx";
 import {FaFilter} from "react-icons/fa";
 import type {ColumnType} from "antd/es/table";
 import AuthorReviewSpecsModal from "@pages/AuthorReviewSpecsPage/AuthorReviewSpecsModal.tsx";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const AuthorReviewSpecsPage = () => {
     document.title = "Реестр специалистов авторского надзора";
@@ -115,7 +116,7 @@ const AuthorReviewSpecsPage = () => {
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.object_workers_list)}/>
                 <span className={"font-bold"}>Реестр специалистов авторского надзора</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => {

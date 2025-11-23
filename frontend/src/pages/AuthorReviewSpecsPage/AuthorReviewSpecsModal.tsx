@@ -113,3 +113,5 @@ const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
 
 export default AuthorReviewSpecsModal;
 
+
+

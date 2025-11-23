@@ -48,7 +48,7 @@ const DisciplineShortNamesPage = () => {
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.journal_lists)}/>
                 <span className={"font-bold"}>Сокращенное наименование дисциплин</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                v
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => setIsCreateShortName(true)}

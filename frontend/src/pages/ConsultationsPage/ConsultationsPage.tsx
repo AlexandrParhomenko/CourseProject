@@ -9,6 +9,7 @@ import TableHeader from "@components/TableHeader/TableHeader.tsx";
 import {FaFilter} from "react-icons/fa";
 import type {ColumnType} from "antd/es/table";
 import ConsultationsModal from "@pages/ConsultationsPage/ConsultationsModal.tsx";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const ConsultationsPage = () => {
     document.title = "Реестр консультаций";
@@ -94,7 +95,7 @@ const ConsultationsPage = () => {
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.main)}/>
                 <span className={"font-bold"}>Реестр консультаций</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => {
@@ -146,6 +147,8 @@ const ConsultationsPage = () => {
 };
 
 export default ConsultationsPage;
+
+
 
 
 
