@@ -85,8 +85,8 @@ export class Specialist extends Model<Specialist, CreateSpecialistDto> {
     @BelongsTo(() => Contract, {foreignKey: 'contract_id', as: 'contract'})
     contract: Contract;
 
-    @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'createRowUser'})
-    createRowUser: User;
+    @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'create_row_user'})
+    create_row_user: User;
 }
 
 

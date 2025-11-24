@@ -23,7 +23,7 @@ export class ContractService {
     async getAllContracts() {
         return await this.contractStorage.findAll({
             include: [
-                {model: User, as: 'createRowUser', attributes: ['user_id', 'fullname']},
+                {model: User, as: 'create_row_user', attributes: ['user_id', 'fullname']},
                 {model: User, as: 'lastCorrectUser', attributes: ['user_id', 'fullname']},
                 {model: User, as: 'deletionUser', attributes: ['user_id', 'fullname']}
             ],
@@ -34,7 +34,7 @@ export class ContractService {
     async getContractById(contract_id: number) {
         const contract = await this.contractStorage.findByPk(contract_id, {
             include: [
-                {model: User, as: 'createRowUser', attributes: ['user_id', 'fullname']},
+                {model: User, as: 'create_row_user', attributes: ['user_id', 'fullname']},
                 {model: User, as: 'lastCorrectUser', attributes: ['user_id', 'fullname']},
                 {model: User, as: 'deletionUser', attributes: ['user_id', 'fullname']}
             ]

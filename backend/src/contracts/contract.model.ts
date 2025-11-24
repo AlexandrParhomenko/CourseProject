@@ -87,8 +87,8 @@ export class Contract extends Model<Contract, CreateContractDto> {
     })
     deletion_datetime: Date;
 
-    @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'createRowUser'})
-    createRowUser: User;
+    @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'create_row_user'})
+    create_row_user: User;
 
     @BelongsTo(() => User, {foreignKey: 'last_correct_user_id', as: 'lastCorrectUser'})
     lastCorrectUser: User;

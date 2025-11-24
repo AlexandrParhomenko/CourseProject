@@ -27,7 +27,7 @@ export class ObjectsService {
             },
             include: [
                 {model: Contract, as: 'contract', attributes: ['contract_id', 'number_contract']},
-                {model: User, as: 'createRowUser', attributes: ['user_id', 'fullname']}
+                {model: User, as: 'create_row_user', attributes: ['user_id', 'fullname']}
             ],
             order: [['object_id', 'DESC']]
         });
@@ -37,7 +37,7 @@ export class ObjectsService {
         const object = await this.objectStorage.findByPk(object_id, {
             include: [
                 {model: Contract, as: 'contract', attributes: ['contract_id', 'number_contract']},
-                {model: User, as: 'createRowUser', attributes: ['user_id', 'fullname']}
+                {model: User, as: 'create_row_user', attributes: ['user_id', 'fullname']}
             ]
         });
         if (!object) {

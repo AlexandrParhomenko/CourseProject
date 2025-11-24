@@ -7,14 +7,18 @@ import {Contract} from "./contracts/contract.model";
 import {ObjectTable} from "./objects/object.model";
 import {Specialist} from "./specialists/specialist.model";
 import {VisitSheet} from "./visit-sheets/visit-sheet.model";
+import {Consultation} from "./consultations/consultation.model";
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { ContractModule } from './contracts/contract.module';
 import { ObjectsModule } from './objects/objects.module';
 import { SpecialistsModule } from './specialists/specialists.module';
 import { VisitSheetsModule } from './visit-sheets/visit-sheets.module';
+import { ConsultationsModule } from './consultations/consultations.module';
 import {ServeStaticModule} from "@nestjs/serve-static";
 import * as path from "path";
+import {Block} from "./blocks/block.model";
+import {BlockModule} from "./blocks/block.module";
 @Module({
     controllers: [],
     providers: [],
@@ -32,7 +36,7 @@ import * as path from "path";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Contract, ObjectTable, Specialist, VisitSheet],
+            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block],
             autoLoadModels: true
         }),
         UsersModule,
@@ -42,6 +46,8 @@ import * as path from "path";
         ObjectsModule,
         SpecialistsModule,
         VisitSheetsModule,
+        ConsultationsModule,
+        BlockModule
     ],
 })
 export class AppModule {}

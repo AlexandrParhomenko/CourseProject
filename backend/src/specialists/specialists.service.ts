@@ -26,8 +26,16 @@ export class SpecialistsService {
                 contract_id: contractId
             },
             include: [
-                {model: Contract, as: 'contract', attributes: ['contract_id', 'number_contract']},
-                {model: User, as: 'createRowUser', attributes: ['user_id', 'fullname']}
+                {
+                    model: Contract,
+                    as: 'contract',
+                    attributes: ['number_contract']
+                },
+                {
+                    model: User,
+                    as: 'create_row_user',
+                    attributes: ['fullname']
+                }
             ],
             order: [['specialist_id', 'DESC']]
         });
@@ -36,8 +44,8 @@ export class SpecialistsService {
     async getSpecialistById(id: number) {
         const specialist = await this.specialistStorage.findByPk(id, {
             include: [
-                {model: Contract, as: 'contract', attributes: ['contract_id', 'number_contract']},
-                {model: User, as: 'createRowUser', attributes: ['user_id', 'fullname']}
+                {model: Contract, as: 'contract', attributes: ['contract_id', 'number_contract'], nested: undefined},
+                {model: User, as: 'create_row_user', attributes: ['user_id', 'fullname'], nested: true}
             ]
         });
         if (!specialist) {

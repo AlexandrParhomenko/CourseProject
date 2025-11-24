@@ -39,7 +39,7 @@ export class VisitSheetsService {
             include: [
                 {model: Contract, as: 'contract', attributes: ['contract_id', 'number_contract']},
                 {model: Specialist, as: 'specialist', attributes: ['specialist_id', 'fullname', 'post_specialist']},
-                {model: User, as: 'createRowUser', attributes: ['user_id', 'fullname']}
+                {model: User, as: 'create_row_user', attributes: ['user_id', 'fullname']}
             ]
         });
         if (!visitSheet) {

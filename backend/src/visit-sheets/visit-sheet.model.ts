@@ -81,7 +81,7 @@ export class VisitSheet extends Model<VisitSheet, CreateVisitSheetDto> {
     @BelongsTo(() => Specialist, {foreignKey: 'specialist_id', as: 'specialist'})
     specialist: Specialist;
 
-    @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'createRowUser'})
-    createRowUser: User;
+    @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'create_row_user'})
+    create_row_user: User;
 }
 

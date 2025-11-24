@@ -1,19 +1,19 @@
 import {AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
-import {CreateObjectDto} from "./dto/create-object.dto";
-import {User} from "../users/users.model";
+import {CreateBlockDto} from "./dto/create-block.dto";
 import {Contract} from "../contracts/contract.model";
+import {User} from "../users/users.model";
 
-@Table({tableName: "objects", timestamps: false})
-export class ObjectTable extends Model<ObjectTable, CreateObjectDto> {
-    @ApiProperty({ example: 1, description: 'Уникальный ID объекта' })
+@Table({tableName: "blocks", timestamps: false})
+export class Block extends Model<Block, CreateBlockDto> {
+    @ApiProperty({ example: 1, description: 'Уникальный ID блока' })
     @PrimaryKey
     @AutoIncrement
     @Column({
         type: DataType.INTEGER,
-        field: 'object_id'
+        field: 'block_id'
     })
-    object_id: number;
+    block_id: number;
 
     @ApiProperty({example: 1, description: 'ID контракта'})
     @ForeignKey(() => Contract)
@@ -24,17 +24,29 @@ export class ObjectTable extends Model<ObjectTable, CreateObjectDto> {
     })
     contract_id: number;
 
-    @ApiProperty({example: "001", description: 'Номер объекта'})
-    @Column({type: DataType.STRING, allowNull: false, field: 'number_object'})
-    number_object: string;
+    @ApiProperty({example: "Обозначение блока", description: 'Обозначение блока'})
+    @Column({
+        type: DataType.TEXT,
+        allowNull: false,
+        field: 'designation_block'
+    })
+    designation_block: string;
 
-    @ApiProperty({example: "ОО", description: 'Сокращенное название объекта'})
-    @Column({type: DataType.STRING, allowNull: false, field: 'abbreve_name_object'})
-    abbreve_name_object: string;
+    @ApiProperty({example: "Название блока", description: 'Название блока'})
+    @Column({
+        type: DataType.TEXT,
+        allowNull: false,
+        field: 'name_block'
+    })
+    name_block: string;
 
-    @ApiProperty({example: "Объект строительства", description: 'Полное название объекта'})
-    @Column({type: DataType.STRING, allowNull: false, field: 'full_name_object'})
-    full_name_object: string;
+    @ApiProperty({example: "Заметки", description: 'Заметки'})
+    @Column({
+        type: DataType.TEXT,
+        allowNull: true,
+        field: 'note_block'
+    })
+    note_block: string;
 
     @ApiProperty({example: 1, description: 'ID пользователя, создавшего запись'})
     @ForeignKey(() => User)
