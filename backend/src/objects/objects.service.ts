@@ -56,8 +56,8 @@ export class ObjectsService {
 
     async deleteObject(id: number) {
         const object = await this.getObjectById(id);
-        await object.destroy();
-        return {message: `Объект с ID ${id} успешно удален`};
+        await object.update({deleted: true});
+        return await this.getObjectById(id);
     }
 }
 

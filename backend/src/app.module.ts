@@ -19,6 +19,14 @@ import {ServeStaticModule} from "@nestjs/serve-static";
 import * as path from "path";
 import {Block} from "./blocks/block.model";
 import {BlockModule} from "./blocks/block.module";
+import {OrganisationModule} from "./organisations/organisation.module";
+import {Organization} from "./organisations/organisation.model";
+import {OrganisationContactPersonModule} from "./organization_contract_person/organisation-contact-person.module";
+import {OrganizationContact} from "./organization_contract_person/organisation-contact-person.model";
+import {DefectModule} from "./defects/defect.module";
+import {Defect} from "./defects/defect.model";
+import {TypeDocs} from "./type-docs/type-doc.model";
+import {TypeDocModule} from "./type-docs/type-doc.module";
 @Module({
     controllers: [],
     providers: [],
@@ -36,7 +44,7 @@ import {BlockModule} from "./blocks/block.module";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block],
+            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs],
             autoLoadModels: true
         }),
         UsersModule,
@@ -47,7 +55,11 @@ import {BlockModule} from "./blocks/block.module";
         SpecialistsModule,
         VisitSheetsModule,
         ConsultationsModule,
-        BlockModule
+        BlockModule,
+        OrganisationModule,
+        OrganisationContactPersonModule,
+        DefectModule,
+        TypeDocModule
     ],
 })
 export class AppModule {}
