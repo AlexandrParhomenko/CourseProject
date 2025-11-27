@@ -20,7 +20,11 @@ export class TypeDocService {
     }
 
     async getTypeDocs() {
-        return await this.typeDocStorage.findAll()
+        return await this.typeDocStorage.findAll({
+            where: {
+                deleted: false
+            }
+        })
     }
 
     async getTypeDocById(type_doc_id: number) {

@@ -23,6 +23,7 @@ export class BlockService {
     async getBlocksByContractId(contractId: number) {
         return await this.blockStorage.findAll({
             where: {
+                deleted: false,
                 contract_id: contractId
             },
             include: [

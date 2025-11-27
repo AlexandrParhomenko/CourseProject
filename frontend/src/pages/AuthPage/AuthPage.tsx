@@ -14,7 +14,6 @@ const AuthPage = () => {
     const navigate = useNavigate();
 
     const onAuth = (values: LoginRequest) => {
-        console.log(values)
         login.mutate({
             login: values.login,
             hash_password: values.password
@@ -49,6 +48,7 @@ const AuthPage = () => {
                       layout={"vertical"}>
                     <Form.Item className={"w-full"}
                                name={"login"}
+                               initialValue={"IvanovII"}
                                hasFeedback
                                rules={[
                                    {
@@ -62,6 +62,7 @@ const AuthPage = () => {
                     </Form.Item>
                     <Form.Item label={"Пароль"}
                                name={"password"}
+                               initialValue={"123456"}
                                className={"w-full"}
                                hasFeedback
                                rules={[

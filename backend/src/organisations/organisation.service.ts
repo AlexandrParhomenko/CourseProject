@@ -22,6 +22,7 @@ export class OrganisationService {
     async getOrganisationsByContractId(contractId: number) {
         return await this.organisationStorage.findAll({
             where: {
+                deleted: false,
                 contract_id: contractId
             },
             order: [['organization_id', 'DESC']]

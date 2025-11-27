@@ -20,7 +20,11 @@ export class DefectService {
     }
 
     async getDefects() {
-        return await this.defectStorage.findAll();
+        return await this.defectStorage.findAll({
+            where: {
+                deleted: false
+            }
+        });
     }
 
     async getDefectById(importance_defect_id: number) {

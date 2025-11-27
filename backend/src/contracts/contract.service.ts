@@ -22,6 +22,9 @@ export class ContractService {
 
     async getAllContracts() {
         return await this.contractStorage.findAll({
+            where: {
+              deleted: false
+            },
             include: [
                 {model: User, as: 'create_row_user', attributes: ['user_id', 'fullname']},
                 {model: User, as: 'lastCorrectUser', attributes: ['user_id', 'fullname']},

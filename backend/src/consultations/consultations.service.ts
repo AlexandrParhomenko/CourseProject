@@ -23,6 +23,7 @@ export class ConsultationsService {
     async getConsultationsByContractId(contractId: number) {
         return await this.consultationStorage.findAll({
             where: {
+                deleted: false,
                 contract_id: contractId
             },
             include: [

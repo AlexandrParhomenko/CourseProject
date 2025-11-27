@@ -27,6 +27,10 @@ import {DefectModule} from "./defects/defect.module";
 import {Defect} from "./defects/defect.model";
 import {TypeDocs} from "./type-docs/type-doc.model";
 import {TypeDocModule} from "./type-docs/type-doc.module";
+import {Discipline} from "./disciplines/discipline.model";
+import {DisciplineModule} from "./disciplines/discipline.module";
+import {Brands} from "./brands/brands.model";
+import {BrandsModule} from "./brands/brands.module";
 @Module({
     controllers: [],
     providers: [],
@@ -44,7 +48,7 @@ import {TypeDocModule} from "./type-docs/type-doc.module";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs],
+            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands],
             autoLoadModels: true
         }),
         UsersModule,
@@ -59,7 +63,9 @@ import {TypeDocModule} from "./type-docs/type-doc.module";
         OrganisationModule,
         OrganisationContactPersonModule,
         DefectModule,
-        TypeDocModule
+        TypeDocModule,
+        DisciplineModule,
+        BrandsModule
     ],
 })
 export class AppModule {}

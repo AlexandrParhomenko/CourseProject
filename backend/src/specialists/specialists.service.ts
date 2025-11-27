@@ -23,6 +23,7 @@ export class SpecialistsService {
     async getSpecialistsByContractId(contractId: number) {
         return await this.specialistStorage.findAll({
             where: {
+                deleted: false,
                 contract_id: contractId
             },
             include: [

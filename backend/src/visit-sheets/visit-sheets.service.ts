@@ -25,6 +25,7 @@ export class VisitSheetsService {
     async getVisitSheetsByContractId(contractId: number) {
         return await this.visitSheetStorage.findAll({
             where: {
+                deleted: false,
                 contract_id: contractId
             },
             include: [

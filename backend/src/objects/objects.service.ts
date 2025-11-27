@@ -23,6 +23,7 @@ export class ObjectsService {
     async getObjectsByContractId(contractId: number) {
         return await this.objectStorage.findAll({
             where: {
+                deleted: false,
                 contract_id: contractId
             },
             include: [

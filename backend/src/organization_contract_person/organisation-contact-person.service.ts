@@ -22,6 +22,7 @@ export class OrganisationContactPersonService {
     async getOrganisationsContactsByContractId(contractId: number) {
         return await this.organisationContactStorage.findAll({
             where: {
+                deleted: false,
                 contract_id: contractId
             },
             order: [['organization_contact_person_id', 'DESC']]
