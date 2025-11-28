@@ -1,6 +1,6 @@
 import {Module} from "@nestjs/common";
 import {SequelizeModule} from "@nestjs/sequelize";
-import { UsersModule } from './users/users.module';
+import {UsersModule} from './users/users.module';
 import {ConfigModule} from "@nestjs/config";
 import {User} from "./users/users.model";
 import {Contract} from "./contracts/contract.model";
@@ -8,13 +8,13 @@ import {ObjectTable} from "./objects/object.model";
 import {Specialist} from "./specialists/specialist.model";
 import {VisitSheet} from "./visit-sheets/visit-sheet.model";
 import {Consultation} from "./consultations/consultation.model";
-import { AuthModule } from './auth/auth.module';
-import { FilesModule } from './files/files.module';
-import { ContractModule } from './contracts/contract.module';
-import { ObjectsModule } from './objects/objects.module';
-import { SpecialistsModule } from './specialists/specialists.module';
-import { VisitSheetsModule } from './visit-sheets/visit-sheets.module';
-import { ConsultationsModule } from './consultations/consultations.module';
+import {AuthModule} from './auth/auth.module';
+import {FilesModule} from './files/files.module';
+import {ContractModule} from './contracts/contract.module';
+import {ObjectsModule} from './objects/objects.module';
+import {SpecialistsModule} from './specialists/specialists.module';
+import {VisitSheetsModule} from './visit-sheets/visit-sheets.module';
+import {ConsultationsModule} from './consultations/consultations.module';
 import {ServeStaticModule} from "@nestjs/serve-static";
 import * as path from "path";
 import {Block} from "./blocks/block.model";
@@ -31,6 +31,13 @@ import {Discipline} from "./disciplines/discipline.model";
 import {DisciplineModule} from "./disciplines/discipline.module";
 import {Brands} from "./brands/brands.model";
 import {BrandsModule} from "./brands/brands.module";
+import {UserRoles} from "./user-roles/user-role.model";
+import {UserRoleModule} from "./user-roles/user-role.module";
+import {TypeWorks} from "./type-works/type-works.model";
+import {TypeWorksModule} from "./type-works/type-works.module";
+import {AbbreveBrand} from "./abbreve-brand/abbreve-brand.model";
+import {AbbreveBrandModule} from "./abbreve-brand/abbreve-brand.module";
+
 @Module({
     controllers: [],
     providers: [],
@@ -48,7 +55,7 @@ import {BrandsModule} from "./brands/brands.module";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands],
+            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands, UserRoles, TypeWorks, AbbreveBrand],
             autoLoadModels: true
         }),
         UsersModule,
@@ -65,7 +72,11 @@ import {BrandsModule} from "./brands/brands.module";
         DefectModule,
         TypeDocModule,
         DisciplineModule,
-        BrandsModule
+        BrandsModule,
+        UserRoleModule,
+        TypeWorksModule,
+        AbbreveBrandModule
     ],
 })
-export class AppModule {}
+export class AppModule {
+}
