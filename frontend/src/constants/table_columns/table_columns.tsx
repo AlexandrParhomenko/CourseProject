@@ -1,4 +1,5 @@
 import type {TableColumnsType} from "antd";
+import type {ColumnType} from "antd/es/table";
 
 export const itdRegistry: TableColumnsType<any> = [
     {
@@ -60,7 +61,7 @@ export const itdRegistry: TableColumnsType<any> = [
     }
 ]
 
-export const supervisionJournalColumns = [
+export const supervisionJournalColumns: ColumnType<any>[] = [
     {
         width: 20,
         align: "center",
