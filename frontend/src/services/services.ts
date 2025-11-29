@@ -1,16 +1,32 @@
-import {useMutation} from "@tanstack/react-query";
 import {BASE_URL} from "../constants/constants.ts";
-import type {LoginDto, User} from "@/types/types.ts";
 
-const apiRequest = async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
+/**
+ * @deprecated Use apiClient from @/services/api/client.ts instead
+ * This function is kept for backward compatibility
+ */
+export const apiRequest = async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
+    const token = sessionStorage.getItem("token") || localStorage.getItem("token");
+    const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+    };
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${BASE_URL}${endpoint}`, {
         credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers,
-        },
         ...options,
+        headers,
     });
+
+    if (response.status === 401) {
+        sessionStorage.removeItem("token");
+        localStorage.removeItem("token");
+        window.location.href = '/';
+        throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
+    }
 
     if (!response.ok) {
         const error = await response.json().catch(() => ({message: 'Ошибка сервера'}));
@@ -20,19 +36,5 @@ const apiRequest = async <T>(endpoint: string, options?: RequestInit): Promise<T
     return response.json();
 };
 
-// API функции
-export const authApi = {
-    login: async (data: LoginDto): Promise<User> => {
-        return apiRequest<User>('/auth/login', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
-    },
-};
 
-export const useLogin = () => {
-    return useMutation<User, Error, LoginDto>({
-        mutationFn: authApi.login,
-    });
-};
 

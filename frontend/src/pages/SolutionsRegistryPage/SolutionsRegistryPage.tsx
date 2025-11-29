@@ -9,9 +9,11 @@ import TableHeader from "@components/TableHeader/TableHeader.tsx";
 import {FaFilter} from "react-icons/fa";
 import type {ColumnType} from "antd/es/table";
 import SolutionsRegistryModal from "@pages/SolutionsRegistryPage/SolutionsRegistryModal.tsx";
+import {roleStore} from "@/store/store.ts";
 
 const SolutionsRegistryPage = () => {
     document.title = "Реестр технических решений";
+    const {role} = roleStore();
     const navigate = useNavigate();
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
@@ -125,7 +127,7 @@ const SolutionsRegistryPage = () => {
         <Flex vertical align={"center"} gap={20} className={"h-screen w-full"}>
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.main)}/>
-                <span className={"font-bold"}>Реестр технических решений разработанных и выданных в рамках АН по договору number_contract с последующим внесением в РД</span>
+                <span className={"font-bold"}>Реестр технических решений разработанных и выданных в рамках АН по договору {role ? role.contract.number_contract : "-"} с последующим внесением в РД</span>
                 <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
             </div>
             <div className={"w-full p-6"}>

@@ -10,9 +10,11 @@ import {FaFilter} from "react-icons/fa";
 import {itdRegistry} from "@/constants/table_columns/table_columns.tsx";
 import IDTRegistryModal from "@pages/ITDRegustryPage/IDTRegistryModal.tsx";
 import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
+import {roleStore} from "@/store/store.ts";
 
 const ItdRegistryPage = () => {
-    document.title = "Реестр подписанной ИТД в рамках АН по договору number_contract";
+    const {role} = roleStore();
+    document.title = `Реестр подписанной ИТД в рамках АН по договору ${role ? role.contract.number_contract : "-"}`;
     const navigate = useNavigate();
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
@@ -69,7 +71,7 @@ const ItdRegistryPage = () => {
         <Flex vertical align={"center"} gap={20} className={"h-screen w-full"}>
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.main)}/>
-                <span className={"font-bold"}>Реестр подписанной ИТД в рамках АН по договору number_contract</span>
+                <span className={"font-bold"}>Реестр подписанной ИТД в рамках АН по договору {role ? role.contract.number_contract : "-"}</span>
                 <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>

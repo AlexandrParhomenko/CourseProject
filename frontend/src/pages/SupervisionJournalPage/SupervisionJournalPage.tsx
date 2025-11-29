@@ -10,9 +10,11 @@ import {useForm} from "antd/es/form/Form";
 import {FaFilter} from "react-icons/fa";
 import SupervisionJournalModal from "@pages/SupervisionJournalPage/SupervisionJournalModal.tsx";
 import type {ModalType} from "@/types/types.ts";
+import {roleStore} from "@/store/store.ts";
 
 const SupervisionJournalPage = () => {
     document.title = "Электронный журнал авторского надзора";
+    const {role} = roleStore();
     const navigate = useNavigate();
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
@@ -113,7 +115,7 @@ const SupervisionJournalPage = () => {
         <Flex vertical align={"center"} gap={20} className={"h-screen w-full"}>
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.main)}/>
-                <span className={"font-bold"}>Электронный журнал авторского надзора за строительством объекта(ов) по договору number_contract</span>
+                <span className={"font-bold"}>Электронный журнал авторского надзора за строительством объекта(ов) по договору {role ? role.contract.number_contract : "-"}</span>
                 <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
             </div>
             <div className={"w-full p-6"}>

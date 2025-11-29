@@ -27,7 +27,7 @@ export class UserRoleService {
                 user_id: userId
             },
             include: [
-                {model: Contract, as: 'contract', attributes: ['contract_id', 'number_contract']},
+                {model: Contract, as: 'contract', attributes: ['number_contract']},
                 {model: User, as: 'create_row_user', attributes: ['user_id', 'fullname']}
             ],
             order: [['user_role_id', 'DESC']]

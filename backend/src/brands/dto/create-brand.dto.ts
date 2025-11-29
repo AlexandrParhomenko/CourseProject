@@ -14,7 +14,7 @@ export class CreateBrandDto {
 
     @ApiProperty({example: 1, description: 'Название'})
     @IsString({message: 'Поле должно быть строкой'})
-    readonly title: number;
+    readonly title: string;
 
     @ApiProperty({example: 1, description: 'ID дисциплины'})
     @IsNumber({}, {message: 'Поле должно быть числом'})

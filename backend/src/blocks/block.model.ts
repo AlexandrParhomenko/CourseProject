@@ -24,23 +24,23 @@ export class Block extends Model<Block, CreateBlockDto> {
     })
     contract_id: number;
 
-    @ApiProperty({example: "Обозначение блока", description: 'Обозначение блока'})
+    @ApiProperty({example: "БЛ-001", description: 'Обозначение блока'})
     @Column({
-        type: DataType.TEXT,
+        type: DataType.STRING,
         allowNull: false,
         field: 'designation_block'
     })
     designation_block: string;
 
-    @ApiProperty({example: "Название блока", description: 'Название блока'})
+    @ApiProperty({example: "Блок управления", description: 'Название блока'})
     @Column({
-        type: DataType.TEXT,
+        type: DataType.STRING,
         allowNull: false,
         field: 'name_block'
     })
     name_block: string;
 
-    @ApiProperty({example: "Заметки", description: 'Заметки'})
+    @ApiProperty({example: "Примечание к блоку", description: 'Примечание'})
     @Column({
         type: DataType.TEXT,
         allowNull: true,
@@ -79,4 +79,3 @@ export class Block extends Model<Block, CreateBlockDto> {
     @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'create_row_user'})
     create_row_user: User;
 }
-

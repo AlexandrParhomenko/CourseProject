@@ -18,7 +18,7 @@ import {ConsultationsModule} from './consultations/consultations.module';
 import {ServeStaticModule} from "@nestjs/serve-static";
 import * as path from "path";
 import {Block} from "./blocks/block.model";
-import {BlockModule} from "./blocks/block.module";
+import {BlocksModule} from "./blocks/blocks.module";
 import {OrganisationModule} from "./organisations/organisation.module";
 import {Organization} from "./organisations/organisation.model";
 import {OrganisationContactPersonModule} from "./organization_contract_person/organisation-contact-person.module";
@@ -37,6 +37,12 @@ import {TypeWorks} from "./type-works/type-works.model";
 import {TypeWorksModule} from "./type-works/type-works.module";
 import {AbbreveBrand} from "./abbreve-brand/abbreve-brand.model";
 import {AbbreveBrandModule} from "./abbreve-brand/abbreve-brand.module";
+import {MainJournal} from "./main-journal/main-journal.model";
+import {MainJournalModule} from "./main-journal/main-journal.module";
+import {TechnicalRegistry} from "./register-technical-solutions/register-technical-solutions.model";
+import {RegisterTechnicalSolutionsModule} from "./register-technical-solutions/register-technical-solutions.module";
+import {Registry} from "./registry/registry.model";
+import {RegistryModule} from "./registry/registry.module";
 
 @Module({
     controllers: [],
@@ -55,7 +61,7 @@ import {AbbreveBrandModule} from "./abbreve-brand/abbreve-brand.module";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands, UserRoles, TypeWorks, AbbreveBrand],
+            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands, UserRoles, TypeWorks, AbbreveBrand, MainJournal, TechnicalRegistry, Registry],
             autoLoadModels: true
         }),
         UsersModule,
@@ -66,7 +72,7 @@ import {AbbreveBrandModule} from "./abbreve-brand/abbreve-brand.module";
         SpecialistsModule,
         VisitSheetsModule,
         ConsultationsModule,
-        BlockModule,
+        BlocksModule,
         OrganisationModule,
         OrganisationContactPersonModule,
         DefectModule,
@@ -75,7 +81,10 @@ import {AbbreveBrandModule} from "./abbreve-brand/abbreve-brand.module";
         BrandsModule,
         UserRoleModule,
         TypeWorksModule,
-        AbbreveBrandModule
+        AbbreveBrandModule,
+        MainJournalModule,
+        RegisterTechnicalSolutionsModule,
+        RegistryModule
     ],
 })
 export class AppModule {

@@ -1,17 +1,24 @@
 import {ApiProperty} from "@nestjs/swagger";
-import {IsString} from "class-validator";
+import {IsString, IsOptional, IsNumber} from "class-validator";
 
 export class UpdateBlockDto {
-    @ApiProperty({example: "Обозначение блока", description: 'Обозначение блока'})
-    @IsString({message: 'Поле должно быть строкой'})
-    readonly designation_block: string;
+    @ApiProperty({example: 1, description: 'ID контракта', required: false})
+    @IsNumber({}, {message: 'Поле должно быть числом'})
+    @IsOptional()
+    readonly contract_id?: number;
 
-    @ApiProperty({example: "Название блока", description: 'Название блока'})
+    @ApiProperty({example: "БЛ-001", description: 'Обозначение блока', required: false})
     @IsString({message: 'Поле должно быть строкой'})
-    readonly name_block: string;
+    @IsOptional()
+    readonly designation_block?: string;
 
-    @ApiProperty({example: "Заметка", description: 'Заметка'})
+    @ApiProperty({example: "Блок управления", description: 'Название блока', required: false})
     @IsString({message: 'Поле должно быть строкой'})
-    readonly note_block: string;
+    @IsOptional()
+    readonly name_block?: string;
+
+    @ApiProperty({example: "Примечание к блоку", description: 'Примечание', required: false})
+    @IsString({message: 'Поле должно быть строкой'})
+    @IsOptional()
+    readonly note_block?: string;
 }
-

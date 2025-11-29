@@ -2,17 +2,28 @@ import {Button, Form, type FormInstance, Input, message} from "antd";
 import {useEffect, useRef} from "react";
 import {useNavigate} from "react-router-dom";
 import routes from "../../router/routes.ts";
-import {useLogin} from "@/services/services.ts";
 import type {LoginRequest} from "@/types/types.ts";
 import {messageResponse} from "@/utils.ts";
+import {useGetUserRoles, useLogin} from "@/services/api/auth/auth.ts";
+import {roleStore, useUserStore} from "@/store/store.ts";
 
 const AuthPage = () => {
     const ref = useRef<FormInstance>(null);
     const [messageApi, contextHolder] = message.useMessage();
     const login = useLogin()
+    const {user, setUser} = useUserStore();
+    const {setRole} = roleStore();
+    const {data, isLoading} = useGetUserRoles(user?.user_id);
     document.title = "Вход";
     const navigate = useNavigate();
 
+    // Если пользователь уже авторизован, перенаправляем на главную
+    useEffect(() => {
+        const token = sessionStorage.getItem("token") || localStorage.getItem("token");
+        if (token && user) {
+            navigate(routes.main, {replace: true});
+        }
+    }, [user, navigate]);
     const onAuth = (values: LoginRequest) => {
         login.mutate({
             login: values.login,
@@ -21,9 +32,16 @@ const AuthPage = () => {
     };
 
     useEffect(() => {
+        if (data && user) {
+            data.length > 0 && setRole(data[0])
+            sessionStorage.setItem("token", user.token);
+            navigate(routes.main, {replace: true});
+        }
+    }, [data, user, navigate]);
+
+    useEffect(() => {
         if (login.data) {
-            sessionStorage.setItem("token", login.data.token);
-            navigate(routes.main)
+            setUser(login.data);
         }
     }, [login.data]);
 
@@ -84,7 +102,7 @@ const AuthPage = () => {
                     {/*           ]}>*/}
                     {/*    <Input type={"number"} min={1}/>*/}
                     {/*</Form.Item>*/}
-                    <Button htmlType="submit" className={"w-full"}>Вход</Button>
+                    <Button loading={isLoading} htmlType="submit" className={"w-full"}>Вход</Button>
                 </Form>
             </div>
         </div>
