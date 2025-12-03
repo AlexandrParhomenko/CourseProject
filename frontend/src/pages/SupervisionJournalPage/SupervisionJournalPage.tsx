@@ -1,7 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {Button, DatePicker, Flex, Form, Input, Popover, Select, Table, Tooltip} from "antd";
-import {supervisionJournalColumns} from "@/constants/table_columns/table_columns.tsx";
 import TableHeader from "@components/TableHeader/TableHeader.tsx";
 import BackBtn from "@components/BackBtn/BackBtn.tsx";
 import routes from "@router/routes.ts";
@@ -9,8 +8,13 @@ import {PiKeyboardLight, PiMicrosoftExcelLogoFill} from "react-icons/pi";
 import {useForm} from "antd/es/form/Form";
 import {FaFilter} from "react-icons/fa";
 import SupervisionJournalModal from "@pages/SupervisionJournalPage/SupervisionJournalModal.tsx";
-import type {ModalType} from "@/types/types.ts";
+import type {ColumnType} from "antd/es/table";
+import type {ModalType, MainJournal} from "@/types/types.ts";
 import {roleStore} from "@/store/store.ts";
+import {
+    useDeleteMainJournal,
+    useGetMainJournalsByContractId
+} from "@/services/api/main-journal/main-journal.ts";
 
 const SupervisionJournalPage = () => {
     document.title = "Электронный журнал авторского надзора";
@@ -19,20 +23,56 @@ const SupervisionJournalPage = () => {
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
     const [openFilter, setOpenFilter] = useState<boolean>(false);
-    const [form] = useForm()
+    const [form] = useForm();
     const {RangePicker} = DatePicker;
-    const object = Form.useWatch("object", form);
-    const title = Form.useWatch("title", form);
-    const brand = Form.useWatch("brand", form);
-    const section = Form.useWatch("section", form);
-    const sub_section = Form.useWatch("sub_section", form);
+    const [pickedMain, setPickedMain] = useState<MainJournal | null>(null);
 
-    const onRow = (record: any) => {
+    const {data, isLoading, refetch} = useGetMainJournalsByContractId(role?.contract_id);
+    const {mutateAsync: deleteMainJournal, isError: isDeleteError} = useDeleteMainJournal();
+
+    const columns: ColumnType<MainJournal & { key: number }>[] = [
+        {
+            width: 50,
+            align: "center",
+            title: "№",
+            dataIndex: "key",
+            key: "key"
+        },
+        {
+            width: 150,
+            align: "center",
+            title: "Дата",
+            dataIndex: "date_supervision",
+            key: "date_supervision"
+        },
+        {
+            align: "center",
+            title: "Выявленные отступления / нарушения",
+            dataIndex: "defects",
+            key: "defects"
+        },
+        {
+            align: "center",
+            title: "Указания об устранении",
+            dataIndex: "instructions",
+            key: "instructions"
+        },
+        {
+            align: "center",
+            title: "Значимость отступления",
+            dataIndex: "importance_defect_id",
+            key: "importance_defect_id"
+        }
+    ];
+
+    const onRow = (record: MainJournal & { key: number }) => {
         return {
-            onChange: () => {
-                console.log(record)
+            onClick: () => {
+                setPickedMain(record);
             },
             onDoubleClick: () => {
+                setModalType("update");
+                setJournalModalOpen(true);
             }
         };
     };
@@ -124,10 +164,12 @@ const SupervisionJournalPage = () => {
                     setJournalModalOpen(true)
                 }}
                              btnName={"Новая запись"}
-                             refetch={() => {
-                             }}
-                             pickedPerson={"object"} id={0}
-                             deleteFunc={() => {
+                             refetch={() => refetch()}
+                             pickedPerson={"main-journal"}
+                             id={{id: pickedMain?.main_journal_id}}
+                             deleteFunc={async ({id}: {id: number}) => {
+                                 if (!role?.contract_id) return;
+                                 await deleteMainJournal({main_journal_id: id, contract_id: role.contract_id});
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -140,7 +182,9 @@ const SupervisionJournalPage = () => {
                                      </div>
                                  </Tooltip>
                              </Popover>}
-                             deleteFuncError={false}
+                             deleteFuncError={isDeleteError}
+                             pickedRow={pickedMain ?? undefined}
+                             setPickedRow={setPickedMain}
                              actionsElems={<>
                                  <Tooltip
                                      placement={"bottom"} title={"Выгрузка в Excel"}>
@@ -159,14 +203,21 @@ const SupervisionJournalPage = () => {
                                      </div>
                                  </Tooltip>
                              </>}
-                             children={<SupervisionJournalModal type={modalType} onClose={() => setJournalModalOpen(false)}
-                                                                isShow={JournalModalOpen}/>}
+                             children={
+                                 <SupervisionJournalModal
+                                     type={modalType}
+                                     onClose={() => setJournalModalOpen(false)}
+                                     isShow={JournalModalOpen}
+                                     picked={pickedMain ?? undefined}
+                                 />
+                             }
                              deleteEntity={"объект"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
-                    dataSource={[]}
+                    loading={isLoading}
+                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     scroll={{x: 4000}}
                     summary={() => {
                         return (
@@ -179,7 +230,7 @@ const SupervisionJournalPage = () => {
                             </Table.Summary>
                         );
                     }}
-                    columns={supervisionJournalColumns}/>
+                    columns={columns}/>
             </div>
         </Flex>
     );

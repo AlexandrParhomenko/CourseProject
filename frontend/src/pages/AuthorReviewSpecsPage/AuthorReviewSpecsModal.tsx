@@ -1,27 +1,64 @@
 import {Button, DatePicker, Form, Input, Modal, Select} from "antd";
 import type {FC} from "react";
 import type {ModalType} from "@typings/types.ts";
+import {roleStore} from "@/store/store.ts";
+import {useCreateSpecialist, useUpdateSpecialist} from "@/services/api/specialists/specialists.ts";
+import type {Specialist} from "@/types/types.ts";
 
 interface IProps {
     isShow: boolean
-    onClose: Function
+    onClose: () => void
     type: ModalType
+    picked?: Specialist
 }
 
-const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
-    const onSubmit = () => {
+const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
+    const [form] = Form.useForm<Specialist>();
+    const {role} = roleStore();
+    const {mutateAsync: createSpecialist, isLoading: isCreateLoading} = useCreateSpecialist();
+    const {mutateAsync: updateSpecialist, isLoading: isUpdateLoading} = useUpdateSpecialist();
 
-    }
+    const isUpdate = type === "update" && picked;
+
+    const onSubmit = async (values: Partial<Specialist>) => {
+        if (!role?.contract_id) return;
+
+        const payload: Partial<Specialist> = {
+            contract_id: role.contract_id,
+            fullname: values.fullname ?? "",
+            post_specialist: values.post_specialist ?? "",
+            phone_number: values.phone_number ?? "",
+            number_doc: values.number_doc!,
+            date_doc: values.date_doc!,
+            type_work: values.type_work,
+        };
+
+        if (isUpdate && picked) {
+            await updateSpecialist({id: picked.specialist_id, data: payload});
+        } else {
+            await createSpecialist(payload);
+        }
+
+        form.resetFields();
+        onClose();
+    };
 
     return (
-        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={() => onClose()} open={isShow}>
+        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={onClose} open={isShow}>
             <div className={"flex items-center flex-col justify-center"}>
                 <span className={"font-bold"}>Запись реестра специалистов авторского надзора</span>
-                <Form scrollToFirstError={{
+                <Form
+                    form={form}
+                    initialValues={picked}
+                    scrollToFirstError={{
                     behavior: "smooth",
                     block: "center",
                     inline: "center"
-                }} className={"flex items-center flex-col w-full"} onFinish={onSubmit} layout={"vertical"}>
+                }}
+                    className={"flex items-center flex-col w-full"}
+                    onFinish={onSubmit}
+                    layout={"vertical"}
+                >
                     <div style={{height: "50vh"}} className={"overflow-y-auto w-full"}>
                         <Form.Item className={"w-full"}
                                    name={"contract_number"}
@@ -29,7 +66,7 @@ const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <Input placeholder={"Введите номер договора"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"fio"}
+                                   name={"fullname"}
                                    rules={[
                                        {
                                            required: true,
@@ -40,7 +77,7 @@ const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <Input placeholder={"Введите ФИО"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"position"}
+                                   name={"post_specialist"}
                                    rules={[
                                        {
                                            required: true,
@@ -51,7 +88,7 @@ const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <Select placeholder={"Выберите должность"}></Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"phone"}
+                                   name={"phone_number"}
                                    rules={[
                                        {
                                            required: true,
@@ -62,7 +99,7 @@ const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <Input placeholder={"Введите номер телефона"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"work_type"}
+                                   name={"type_work"}
                                    rules={[
                                        {
                                            required: true,
@@ -77,7 +114,7 @@ const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
                             </Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"order_number"}
+                                   name={"number_doc"}
                                    rules={[
                                        {
                                            required: true,
@@ -88,7 +125,7 @@ const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <Input placeholder={"Введите номер приказа"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"order_date"}
+                                   name={"date_doc"}
                                    rules={[
                                        {
                                            required: true,
@@ -100,10 +137,8 @@ const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
                         </Form.Item>
                     </div>
                     <Form.Item>
-                        <Button type={"link"} className={"mr-2"} onClick={() => {
-                            onClose()
-                        }}>Отменить</Button>
-                        <Button htmlType="submit">Сохранить</Button>
+                        <Button type={"link"} className={"mr-2"} onClick={onClose}>Отменить</Button>
+                        <Button htmlType="submit" loading={isCreateLoading || isUpdateLoading}>Сохранить</Button>
                     </Form.Item>
                 </Form>
             </div>
@@ -112,6 +147,8 @@ const AuthorReviewSpecsModal: FC<IProps> = ({isShow, onClose, type}) => {
 };
 
 export default AuthorReviewSpecsModal;
+
+
 
 
 

@@ -10,6 +10,12 @@ import {FaFilter} from "react-icons/fa";
 import type {ColumnType} from "antd/es/table";
 import ConsultationsModal from "@pages/ConsultationsPage/ConsultationsModal.tsx";
 import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
+import {roleStore} from "@/store/store.ts";
+import type {Consultation} from "@/types/types.ts";
+import {
+    useDeleteConsultation,
+    useGetConsultationsByContractId
+} from "@/services/api/consultations/consultations.ts";
 
 const ConsultationsPage = () => {
     document.title = "Реестр консультаций";
@@ -17,41 +23,46 @@ const ConsultationsPage = () => {
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
     const [openFilter, setOpenFilter] = useState<boolean>(false);
-    const [form] = useForm()
+    const [form] = useForm();
     const {RangePicker} = DatePicker;
+    const {role} = roleStore();
+    const [pickedConsultation, setPickedConsultation] = useState<Consultation | null>(null);
 
-    const columns: ColumnType<any>[] = [
+    const {data, isLoading, refetch} = useGetConsultationsByContractId(role?.contract_id);
+    const {mutateAsync: deleteConsultation, isError: isDeleteError} = useDeleteConsultation();
+
+    const columns: ColumnType<Consultation & { key: number }>[] = [
         {
             width: 20,
             align: "center",
             title: '№',
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'key',
+            key: 'key',
         },
         {
             align: "center",
             title: 'Дата',
-            dataIndex: 'date',
-            key: 'date',
+            dataIndex: 'date_cons',
+            key: 'date_cons',
         },
         {
             align: "center",
             title: 'Содержание обращения',
-            dataIndex: 'appeal_content',
-            key: 'appeal_content',
+            dataIndex: 'content_cons',
+            key: 'content_cons',
         },
         {
             align: "center",
             title: 'Результат рассмотрения',
-            dataIndex: 'review_result',
-            key: 'review_result',
+            dataIndex: 'result_cons',
+            key: 'result_cons',
         },
     ]
 
-    const onRow = (record: any) => {
+    const onRow = (record: Consultation & { key: number }) => {
         return {
-            onChange: () => {
-                console.log(record)
+            onClick: () => {
+                setPickedConsultation(record);
             },
             onDoubleClick: () => {
                 setModalType("update")
@@ -69,13 +80,13 @@ const ConsultationsPage = () => {
             }} onFinish={() => {
             }} layout="vertical" className="flex items-center flex-col gap-1">
                 <div className={"w-[400px]"}>
-                    <Form.Item name={"date"} label={"Дата"}>
+                    <Form.Item name={"date_cons"} label={"Дата"}>
                         <RangePicker className={"w-full"} format={"DD.MM.YYYY"}/>
                     </Form.Item>
-                    <Form.Item name={"appeal_content"} label={"Содержание обращения"}>
+                    <Form.Item name={"content_cons"} label={"Содержание обращения"}>
                         <Input allowClear placeholder={"Содержание обращения"}/>
                     </Form.Item>
-                    <Form.Item name={"review_result"} label={"Результат рассмотрения"}>
+                    <Form.Item name={"result_cons"} label={"Результат рассмотрения"}>
                         <Input allowClear placeholder={"Результат рассмотрения"}/>
                     </Form.Item>
                 </div>
@@ -103,10 +114,12 @@ const ConsultationsPage = () => {
                     setJournalModalOpen(true)
                 }}
                              btnName={"Новая запись"}
-                             refetch={() => {
-                             }}
-                             pickedPerson={"object"} id={0}
-                             deleteFunc={() => {
+                             refetch={() => refetch()}
+                             pickedPerson={"consultation"}
+                             id={{id: pickedConsultation?.consultation_id}}
+                             deleteFunc={async ({id}: {id: number}) => {
+                                 if (!role?.contract_id) return;
+                                 await deleteConsultation({id, contract_id: role.contract_id});
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -119,16 +132,21 @@ const ConsultationsPage = () => {
                                      </div>
                                  </Tooltip>
                              </Popover>}
-                             deleteFuncError={false}
-                             children={<ConsultationsModal type={modalType}
-                                                                onClose={() => setJournalModalOpen(false)}
-                                                                isShow={JournalModalOpen}/>}
+                             deleteFuncError={isDeleteError}
+                             pickedRow={pickedConsultation ?? undefined}
+                             setPickedRow={setPickedConsultation}
+                             children={<ConsultationsModal
+                                 type={modalType}
+                                 onClose={() => setJournalModalOpen(false)}
+                                 isShow={JournalModalOpen}
+                             />}
                              deleteEntity={"объект"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
-                    dataSource={[]}
+                    loading={isLoading}
+                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
                             <Table.Summary fixed>
@@ -147,6 +165,8 @@ const ConsultationsPage = () => {
 };
 
 export default ConsultationsPage;
+
+
 
 
 

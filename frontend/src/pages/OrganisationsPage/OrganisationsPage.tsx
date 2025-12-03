@@ -2,7 +2,7 @@ import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import type {ModalType} from "@typings/types.ts";
 import {useForm} from "antd/es/form/Form";
-import {Button, Flex, Form, Input, Popover, Select, Table, Tooltip} from "antd";
+import {Button, Flex, Form, Input, Popover, Table, Tooltip} from "antd";
 import BackBtn from "@components/BackBtn/BackBtn.tsx";
 import routes from "@router/routes.ts";
 import TableHeader from "@components/TableHeader/TableHeader.tsx";
@@ -10,6 +10,12 @@ import {FaFilter} from "react-icons/fa";
 import type {ColumnType} from "antd/es/table";
 import OrganisationsModal from "@pages/OrganisationsPage/OrganisationsModal.tsx";
 import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
+import {roleStore} from "@/store/store.ts";
+import type {OrganizationContact} from "@/types/types.ts";
+import {
+    useDeleteOrganizationContact,
+    useGetOrganizationContactsByContractId
+} from "@/services/api/organization-contact-person/organization-contact-person.ts";
 
 const OrganisationsPage = () => {
     document.title = "Реестр организаций";
@@ -17,39 +23,44 @@ const OrganisationsPage = () => {
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
     const [openFilter, setOpenFilter] = useState<boolean>(false);
-    const [form] = useForm()
+    const [form] = useForm();
+    const {role} = roleStore();
+    const [pickedContact, setPickedContact] = useState<OrganizationContact | null>(null);
 
-    const columns: ColumnType<any>[] = [
+    const {data, isLoading, refetch} = useGetOrganizationContactsByContractId(role?.contract_id);
+    const {mutateAsync: deleteOrganizationContact, isError: isDeleteError} = useDeleteOrganizationContact();
+
+    const columns: ColumnType<OrganizationContact & { key: number }>[] = [
         {
             width: 20,
             align: "center",
             title: '№',
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'key',
+            key: 'key',
         },
         {
             align: "center",
             title: 'Участники проекта',
-            dataIndex: 'project_participant',
-            key: 'project_participant',
+            dataIndex: 'project_participants',
+            key: 'project_participants',
         },
         {
             align: "center",
             title: 'Организация',
-            dataIndex: 'organisation',
-            key: 'organisation',
+            dataIndex: 'organization_id',
+            key: 'organization_id',
         },
         {
             align: "center",
             title: 'ФИО контактного лица',
-            dataIndex: 'contact_fio',
-            key: 'contact_fio',
+            dataIndex: 'fullname',
+            key: 'fullname',
         },
         {
             align: "center",
             title: 'Должность',
-            dataIndex: 'position',
-            key: 'position',
+            dataIndex: 'post',
+            key: 'post',
         },
         {
             align: "center",
@@ -60,15 +71,15 @@ const OrganisationsPage = () => {
         {
             align: "center",
             title: 'Контактный номер',
-            dataIndex: 'contact_number',
-            key: 'contact_number',
+            dataIndex: 'phone_number',
+            key: 'phone_number',
         },
     ]
 
-    const onRow = (record: any) => {
+    const onRow = (record: OrganizationContact & { key: number }) => {
         return {
-            onChange: () => {
-                console.log(record)
+            onClick: () => {
+                setPickedContact(record);
             },
             onDoubleClick: () => {
                 setModalType("update")
@@ -123,10 +134,15 @@ const OrganisationsPage = () => {
                     setJournalModalOpen(true)
                 }}
                              btnName={"Новая запись"}
-                             refetch={() => {
-                             }}
-                             pickedPerson={"object"} id={0}
-                             deleteFunc={() => {
+                             refetch={() => refetch()}
+                             pickedPerson={"organization-contact-person"}
+                             id={{id: pickedContact?.organization_contact_person_id}}
+                             deleteFunc={async ({id}: {id: number}) => {
+                                 if (!role?.contract_id) return;
+                                 await deleteOrganizationContact({
+                                     organization_contact_person_id: id,
+                                     contract_id: role.contract_id
+                                 });
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -139,16 +155,22 @@ const OrganisationsPage = () => {
                                      </div>
                                  </Tooltip>
                              </Popover>}
-                             deleteFuncError={false}
-                             children={<OrganisationsModal type={modalType}
-                                                                onClose={() => setJournalModalOpen(false)}
-                                                                isShow={JournalModalOpen}/>}
+                             deleteFuncError={isDeleteError}
+                             pickedRow={pickedContact ?? undefined}
+                             setPickedRow={setPickedContact}
+                             children={<OrganisationsModal
+                                 type={modalType}
+                                 onClose={() => setJournalModalOpen(false)}
+                                 isShow={JournalModalOpen}
+                                 picked={pickedContact ?? undefined}
+                             />}
                              deleteEntity={"объект"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
-                    dataSource={[]}
+                    loading={isLoading}
+                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
                             <Table.Summary fixed>
@@ -167,6 +189,8 @@ const OrganisationsPage = () => {
 };
 
 export default OrganisationsPage;
+
+
 
 
 

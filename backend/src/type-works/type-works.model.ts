@@ -3,7 +3,7 @@ import {ApiProperty} from "@nestjs/swagger";
 import {User} from "../users/users.model";
 import {CreateTypeWorksDto} from "./dto/create-type-works.dto";
 
-@Table({tableName: "type-works", timestamps: false})
+@Table({tableName: "type_works", timestamps: false})
 export class TypeWorks extends Model<TypeWorks, CreateTypeWorksDto> {
     @ApiProperty({ example: 1, description: 'Уникальный ID типа' })
     @PrimaryKey

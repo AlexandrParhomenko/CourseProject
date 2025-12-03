@@ -6,49 +6,59 @@ import BackBtn from "../../components/BackBtn/BackBtn.tsx";
 import routes from "../../router/routes.ts";
 import TableHeader from "../../components/TableHeader/TableHeader.tsx";
 import SRDByBlockModal from "./SRDByBlockModal.tsx";
+import {roleStore} from "@/store/store.ts";
+import type {Block} from "@/types/types.ts";
+import {useDeleteBlock, useGetBlocksByContractId} from "@/services/api/blocks/blocks.ts";
 
 const SrdByBlockPage = () => {
     document.title = "СРД по блокам";
     const navigate = useNavigate();
     const [isCreateSrd, setIsCreateSrd] = useState<boolean>(false);
-    const columns: ColumnType<any>[] = [
+    const {role} = roleStore();
+    const [pickedBlock, setPickedBlock] = useState<Block | null>(null);
+
+    const {data, isLoading, refetch} = useGetBlocksByContractId(role?.contract_id);
+    const {mutateAsync: deleteBlock, isError: isDeleteError} = useDeleteBlock();
+
+    const columns: ColumnType<Block & { key: number }>[] = [
         {
             width: 100,
             align: "center",
             title: '№',
-            dataIndex: 'dr_school_sname',
-            key: 'dr_school_sname',
+            dataIndex: 'key',
+            key: 'key',
         },
         {
             align: "center",
             title: 'Номер договора',
-            dataIndex: 'phone1',
-            key: 'phone1'
+            dataIndex: 'contract',
+            key: 'contract',
+            render: (_, record) => record.contract?.number_contract
         },
         {
             align: "center",
             title: 'Обозначение блока',
-            dataIndex: 'phone1',
-            key: 'phone1'
+            dataIndex: 'designation_block',
+            key: 'designation_block'
         },
         {
             align: "center",
             title: 'Наименование блока',
-            dataIndex: 'phone1',
-            key: 'phone1'
+            dataIndex: 'name_block',
+            key: 'name_block'
         },
         {
             align: "center",
             title: 'Примечание',
-            dataIndex: 'phone1',
-            key: 'phone1'
+            dataIndex: 'note_block',
+            key: 'note_block'
         }
     ]
 
-    const onRow = (record: any) => {
+    const onRow = (record: Block & { key: number }) => {
         return {
-            onChange: () => {
-                console.log(record)
+            onClick: () => {
+                setPickedBlock(record);
             },
             onDoubleClick: () => {
             }
@@ -65,17 +75,28 @@ const SrdByBlockPage = () => {
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => setIsCreateSrd(true)}
                              btnName={"Новая запись"}
-                             refetch={() => {}}
-                             pickedPerson={"object"} id={0}
-                             deleteFunc={() => {}}
-                             deleteFuncError={false}
-                             children={<SRDByBlockModal onClose={() => setIsCreateSrd(false)} isShow={isCreateSrd}/>}
+                             refetch={() => refetch()}
+                             pickedPerson={"block"}
+                             id={{id: pickedBlock?.block_id}}
+                             deleteFunc={async ({id}: {id: number}) => {
+                                 if (!role?.contract_id) return;
+                                 await deleteBlock({id, contract_id: role.contract_id});
+                             }}
+                             deleteFuncError={isDeleteError}
+                             pickedRow={pickedBlock ?? undefined}
+                             setPickedRow={setPickedBlock}
+                             children={<SRDByBlockModal
+                                 onClose={() => setIsCreateSrd(false)}
+                                 isShow={isCreateSrd}
+                                 picked={pickedBlock ?? undefined}
+                             />}
                              deleteEntity={"объект"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
-                    dataSource={[]}
+                    loading={isLoading}
+                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
                             <Table.Summary fixed>

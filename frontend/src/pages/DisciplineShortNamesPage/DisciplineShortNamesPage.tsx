@@ -6,37 +6,44 @@ import BackBtn from "../../components/BackBtn/BackBtn.tsx";
 import routes from "../../router/routes.ts";
 import TableHeader from "../../components/TableHeader/TableHeader.tsx";
 import DisciplineShortNamesModal from "./DisciplineShortNamesModal.tsx";
+import type {Discipline} from "@/types/types.ts";
+import {useDeleteDiscipline, useGetAllDisciplines} from "@/services/api/disciplines/disciplines.ts";
 
 const DisciplineShortNamesPage = () => {
     document.title = "Сокращенное наименование дисциплин";
     const navigate = useNavigate();
     const [isCreateShortName, setIsCreateShortName] = useState<boolean>(false);
-    const columns: ColumnType<any>[] = [
+    const [pickedDiscipline, setPickedDiscipline] = useState<Discipline | null>(null);
+
+    const {data, isLoading, refetch} = useGetAllDisciplines();
+    const {mutateAsync: deleteDiscipline, isError: isDeleteError} = useDeleteDiscipline();
+
+    const columns: ColumnType<Discipline & { key: number }>[] = [
         {
             width: 100,
             align: "center",
             title: '№',
-            dataIndex: 'dr_school_sname',
-            key: 'dr_school_sname',
+            dataIndex: 'key',
+            key: 'key',
         },
         {
             align: "center",
-            title: 'Номер договора',
-            dataIndex: 'phone1',
-            key: 'phone1'
+            title: 'ID дисциплины',
+            dataIndex: 'discipline_id',
+            key: 'discipline_id'
         },
         {
             align: "center",
             title: 'Шифр дисциплины',
-            dataIndex: 'phone1',
-            key: 'phone1'
+            dataIndex: 'discipline',
+            key: 'discipline'
         }
     ]
 
-    const onRow = (record: any) => {
+    const onRow = (record: Discipline & { key: number }) => {
         return {
-            onChange: () => {
-                console.log(record)
+            onClick: () => {
+                setPickedDiscipline(record);
             },
             onDoubleClick: () => {
             }
@@ -53,17 +60,27 @@ const DisciplineShortNamesPage = () => {
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => setIsCreateShortName(true)}
                              btnName={"Новая запись"}
-                             refetch={() => {}}
-                             pickedPerson={"object"} id={0}
-                             deleteFunc={() => {}}
-                             deleteFuncError={false}
-                             children={<DisciplineShortNamesModal onClose={() => setIsCreateShortName(false)} isShow={isCreateShortName}/>}
+                             refetch={() => refetch()}
+                             pickedPerson={"discipline"}
+                             id={{id: pickedDiscipline?.discipline_id}}
+                             deleteFunc={async ({id}: {id: number}) => {
+                                 await deleteDiscipline(id);
+                             }}
+                             deleteFuncError={isDeleteError}
+                             pickedRow={pickedDiscipline ?? undefined}
+                             setPickedRow={setPickedDiscipline}
+                             children={<DisciplineShortNamesModal
+                                 onClose={() => setIsCreateShortName(false)}
+                                 isShow={isCreateShortName}
+                                 picked={pickedDiscipline ?? undefined}
+                             />}
                              deleteEntity={"объект"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
-                    dataSource={[]}
+                    loading={isLoading}
+                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
                             <Table.Summary fixed>

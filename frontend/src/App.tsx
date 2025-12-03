@@ -14,7 +14,7 @@ import WorkTypesPage from "./pages/WorkTypesPage/WorkTypesPage.tsx";
 import DocTypesPage from "./pages/DocTypesPage/DocTypesPage.tsx";
 import RetreatsImportancePage from "./pages/RetreatsImportancePage/RetreatsImportancePage.tsx";
 import SupervisionJournalPage from "./pages/SupervisionJournalPage/SupervisionJournalPage.tsx";
-import ITDRegistryPage from "@pages/ITDRegustryPage/ITDRegistryPage.tsx";
+import ITDRegistryPage from "@pages/ITDRegistryPage/ITDRegistryPage.tsx";
 import SolutionsRegistryPage from "@pages/SolutionsRegistryPage/SolutionsRegistryPage.tsx";
 import AuthorReviewSpecsPage from "@pages/AuthorReviewSpecsPage/AuthorReviewSpecsPage.tsx";
 import RegVisitListPage from "@pages/RegVisitListPage/RegVisitListPage.tsx";

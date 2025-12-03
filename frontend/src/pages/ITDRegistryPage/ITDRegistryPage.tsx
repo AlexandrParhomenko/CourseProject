@@ -8,9 +8,11 @@ import routes from "@router/routes.ts";
 import TableHeader from "@components/TableHeader/TableHeader.tsx";
 import {FaFilter} from "react-icons/fa";
 import {itdRegistry} from "@/constants/table_columns/table_columns.tsx";
-import IDTRegistryModal from "@pages/ITDRegustryPage/IDTRegistryModal.tsx";
+import IDTRegistryModal from "@pages/ITDRegistryPage/IDTRegistryModal.tsx";
 import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 import {roleStore} from "@/store/store.ts";
+import {useDeleteRegistry, useGetRegistriesByContractId} from "@/services/api/registry/registry.ts";
+import type {Registry} from "@/types/types.ts";
 
 const ItdRegistryPage = () => {
     const {role} = roleStore();
@@ -19,13 +21,17 @@ const ItdRegistryPage = () => {
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
     const [openFilter, setOpenFilter] = useState<boolean>(false);
-    const [form] = useForm()
+    const [form] = useForm();
     const {RangePicker} = DatePicker;
+    const [pickedRegistry, setPickedRegistry] = useState<Registry | null>(null);
 
-    const onRow = (record: any) => {
+    const {data, isLoading, refetch} = useGetRegistriesByContractId(role?.contract_id);
+    const {mutateAsync: deleteRegistry, isError: isDeleteError} = useDeleteRegistry();
+
+    const onRow = (record: Registry & { key: number }) => {
         return {
-            onChange: () => {
-                console.log(record)
+            onClick: () => {
+                setPickedRegistry(record);
             },
             onDoubleClick: () => {
                 setModalType("update")
@@ -80,10 +86,12 @@ const ItdRegistryPage = () => {
                     setJournalModalOpen(true)
                 }}
                              btnName={"Новая запись"}
-                             refetch={() => {
-                             }}
-                             pickedPerson={"object"} id={0}
-                             deleteFunc={() => {
+                             refetch={() => refetch()}
+                             pickedPerson={"registry"}
+                             id={{id: pickedRegistry?.registry_id}}
+                             deleteFunc={async ({id}: {id: number}) => {
+                                 if (!role?.contract_id) return;
+                                 await deleteRegistry({registry_id: id, contract_id: role.contract_id});
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -96,16 +104,22 @@ const ItdRegistryPage = () => {
                                      </div>
                                  </Tooltip>
                              </Popover>}
-                             deleteFuncError={false}
-                             children={<IDTRegistryModal type={modalType}
-                                                                onClose={() => setJournalModalOpen(false)}
-                                                                isShow={JournalModalOpen}/>}
+                             deleteFuncError={isDeleteError}
+                             pickedRow={pickedRegistry ?? undefined}
+                             setPickedRow={setPickedRegistry}
+                             children={<IDTRegistryModal
+                                 type={modalType}
+                                 onClose={() => setJournalModalOpen(false)}
+                                 isShow={JournalModalOpen}
+                                 picked={pickedRegistry ?? undefined}
+                             />}
                              deleteEntity={"объект"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
-                    dataSource={[]}
+                    loading={isLoading}
+                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     scroll={{x: 2500}}
                     summary={() => {
                         return (

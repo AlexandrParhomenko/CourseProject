@@ -7,7 +7,7 @@ import {CreateTypeWorksDto} from "./dto/create-type-works.dto";
 import {UpdateTypeWorksDto} from "./dto/update-type-works.dto";
 
 @ApiTags('Типы работ')
-@Controller('type-works')
+@Controller('type_works')
 export class TypeWorksController {
     constructor(private typeWorksService: TypeWorksService) {}
 

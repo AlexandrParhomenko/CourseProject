@@ -7,34 +7,45 @@ import routes from "../../router/routes.ts";
 import TableHeader from "../../components/TableHeader/TableHeader.tsx";
 import DocTypesModal from "./DocTypesModal.tsx";
 import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
+import type {TypeDoc} from "@/types/types.ts";
+import {useDeleteTypeDoc, useGetAllTypeDocs} from "@/services/api/type-docs/type-docs.ts";
 
 const DocTypesPage = () => {
     document.title = "Виды документов в составе ИТД";
     const navigate = useNavigate();
     const [isCreateDocType, setIsCreateDocType] = useState<boolean>(false);
-    const columns: ColumnType<any>[] = [
+    const [pickedDocType, setPickedDocType] = useState<TypeDoc | null>(null);
+
+    const {data, isLoading, refetch} = useGetAllTypeDocs();
+    const {mutateAsync: deleteTypeDoc, isError: isDeleteError} = useDeleteTypeDoc();
+
+    const columns: ColumnType<TypeDoc & { key: number }>[] = [
         {
             width: 100,
             align: "center",
-            title: '№',
-            dataIndex: 'dr_school_sname',
-            key: 'dr_school_sname',
+            title: "№",
+            dataIndex: "key",
+            key: "key",
         },
         {
             align: "center",
-            title: 'Вид документа',
-            dataIndex: 'phone1',
-            key: 'phone1'
-        }
-    ]
+            title: "ID вида документа",
+            dataIndex: "type_doc_id",
+            key: "type_doc_id",
+        },
+        {
+            align: "center",
+            title: "Вид документа",
+            dataIndex: "type_doc",
+            key: "type_doc",
+        },
+    ];
 
-    const onRow = (record: any) => {
+    const onRow = (record: TypeDoc & { key: number }) => {
         return {
-            onChange: () => {
-                console.log(record)
+            onClick: () => {
+                setPickedDocType(record);
             },
-            onDoubleClick: () => {
-            }
         };
     };
 
@@ -46,31 +57,49 @@ const DocTypesPage = () => {
                 <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
-                <TableHeader handleModalOpen={() => setIsCreateDocType(true)}
-                             btnName={"Новая запись"}
-                             refetch={() => {}}
-                             pickedPerson={"object"} id={0}
-                             deleteFunc={() => {}}
-                             deleteFuncError={false}
-                             children={<DocTypesModal onClose={() => setIsCreateDocType(false)} isShow={isCreateDocType}/>}
-                             deleteEntity={"объект"}/>
+                <TableHeader
+                    handleModalOpen={() => setIsCreateDocType(true)}
+                    btnName={"Новая запись"}
+                    refetch={() => refetch()}
+                    pickedPerson={"type-doc"}
+                    id={{id: pickedDocType?.type_doc_id}}
+                    deleteFunc={async ({id}: { id: number }) => {
+                        await deleteTypeDoc(id);
+                    }}
+                    deleteFuncError={isDeleteError}
+                    pickedRow={pickedDocType ?? undefined}
+                    setPickedRow={setPickedDocType}
+                    children={
+                        <DocTypesModal
+                            onClose={() => setIsCreateDocType(false)}
+                            isShow={isCreateDocType}
+                            picked={pickedDocType ?? undefined}
+                        />
+                    }
+                    deleteEntity={"вид документа"}
+                />
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
-                    dataSource={[]}
+                    loading={isLoading}
+                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
+                        const total = data?.length ?? 0;
                         return (
                             <Table.Summary fixed>
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Общее количество записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell index={2}>
+                                        Общее количество записей: {total}
+                                    </Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );
                     }}
-                    columns={columns}/>
+                    columns={columns}
+                />
             </div>
         </Flex>
     );

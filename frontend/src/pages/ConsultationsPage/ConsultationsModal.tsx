@@ -1,35 +1,60 @@
 import {Button, DatePicker, Form, Input, Modal} from "antd";
 import type {FC} from "react";
 import type {ModalType} from "@typings/types.ts";
+import {roleStore} from "@/store/store.ts";
+import {useCreateConsultation} from "@/services/api/consultations/consultations.ts";
+import type {Consultation} from "@/types/types.ts";
 
 interface IProps {
     isShow: boolean
-    onClose: Function
+    onClose: () => void
     type: ModalType
 }
 
 const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
-    const onSubmit = () => {
+    const [form] = Form.useForm<Consultation>();
+    const {role} = roleStore();
+    const {mutateAsync: createConsultation, isLoading} = useCreateConsultation();
 
-    }
+    const onSubmit = async (values: Partial<Consultation>) => {
+        if (!role?.contract_id) return;
+
+        await createConsultation({
+            contract_id: role.contract_id,
+            date_cons: values.date_cons,
+            content_cons: values.content_cons ?? "",
+            result_cons: values.result_cons ?? "",
+        });
+
+        form.resetFields();
+        onClose();
+    };
 
     return (
-        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={() => onClose()} open={isShow}>
+        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={onClose} open={isShow}>
             <div className={"flex items-center flex-col justify-center"}>
                 <span className={"font-bold"}>Запись реестра консультаций</span>
-                <Form scrollToFirstError={{
+                <Form
+                    form={form}
+                    scrollToFirstError={{
                     behavior: "smooth",
                     block: "center",
                     inline: "center"
-                }} className={"flex items-center flex-col w-full"} onFinish={onSubmit} layout={"vertical"}>
+                }}
+                    className={"flex items-center flex-col w-full"}
+                    onFinish={onSubmit}
+                    layout={"vertical"}
+                >
                     <div style={{height: "50vh"}} className={"overflow-y-auto w-full"}>
                         <Form.Item className={"w-full"}
                                    name={"contract_number"}
-                                   label={"Номер договора"}>
-                            <Input placeholder={"Введите номер договора"}/>
+                                   label={"Номер договора"}
+                                   initialValue={role?.contract.number_contract}
+                        >
+                            <Input disabled placeholder={"Введите номер договора"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"date"}
+                                   name={"date_cons"}
                                    rules={[
                                        {
                                            required: true,
@@ -40,7 +65,7 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
                             <DatePicker className={"w-full"} format={"DD.MM.YYYY"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"appeal_content"}
+                                   name={"content_cons"}
                                    rules={[
                                        {
                                            required: true,
@@ -51,7 +76,7 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
                             <Input.TextArea rows={4} placeholder={"Введите содержание обращения"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"review_result"}
+                                   name={"result_cons"}
                                    rules={[
                                        {
                                            required: true,
@@ -63,10 +88,8 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
                         </Form.Item>
                     </div>
                     <Form.Item>
-                        <Button type={"link"} className={"mr-2"} onClick={() => {
-                            onClose()
-                        }}>Отменить</Button>
-                        <Button htmlType="submit">Сохранить</Button>
+                        <Button type={"link"} className={"mr-2"} onClick={onClose}>Отменить</Button>
+                        <Button htmlType="submit" loading={isLoading}>Сохранить</Button>
                     </Form.Item>
                 </Form>
             </div>
@@ -75,6 +98,8 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
 };
 
 export default ConsultationsModal;
+
+
 
 
 

@@ -10,6 +10,12 @@ import {FaFilter} from "react-icons/fa";
 import type {ColumnType} from "antd/es/table";
 import AuthorReviewSpecsModal from "@pages/AuthorReviewSpecsPage/AuthorReviewSpecsModal.tsx";
 import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
+import {roleStore} from "@/store/store.ts";
+import type {Specialist} from "@/types/types.ts";
+import {
+    useDeleteSpecialist,
+    useGetSpecialistsByContractId
+} from "@/services/api/specialists/specialists.ts";
 
 const AuthorReviewSpecsPage = () => {
     document.title = "Реестр специалистов авторского надзора";
@@ -17,58 +23,63 @@ const AuthorReviewSpecsPage = () => {
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
     const [openFilter, setOpenFilter] = useState<boolean>(false);
-    const [form] = useForm()
+    const [form] = useForm();
+    const {role} = roleStore();
+    const [pickedSpecialist, setPickedSpecialist] = useState<Specialist | null>(null);
 
-    const columns: ColumnType<any>[] = [
+    const {data, isLoading, refetch} = useGetSpecialistsByContractId(role?.contract_id);
+    const {mutateAsync: deleteSpecialist, isError: isDeleteError} = useDeleteSpecialist();
+
+    const columns: ColumnType<Specialist & { key: number }>[] = [
         {
             width: 20,
             align: "center",
             title: '№',
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'key',
+            key: 'key',
         },
         {
             align: "center",
             title: 'ФИО',
-            dataIndex: 'fio',
-            key: 'fio',
+            dataIndex: 'fullname',
+            key: 'fullname',
         },
         {
             align: "center",
             title: 'Должность',
-            dataIndex: 'position',
-            key: 'position',
+            dataIndex: 'post_specialist',
+            key: 'post_specialist',
         },
         {
             align: "center",
             title: 'Номер телефона',
-            dataIndex: 'phone',
-            key: 'phone',
+            dataIndex: 'phone_number',
+            key: 'phone_number',
         },
         {
             align: "center",
             title: 'Вид работы, по которой осуществляется авторский надзор',
-            dataIndex: 'work_type',
-            key: 'work_type',
+            dataIndex: 'type_work',
+            key: 'type_work',
         },
         {
             align: "center",
             title: 'Номер документа о полномочиях по проведению авторского надзора. Приказ №___',
-            dataIndex: 'document_number',
-            key: 'document_number',
+            dataIndex: 'number_doc',
+            key: 'number_doc',
         },
         {
             align: "center",
             title: 'Дата документа о полномочиях по проведению авторского надзора. Приказ от ______.',
-            dataIndex: 'document_date',
-            key: 'document_date',
+            dataIndex: 'date_doc',
+            key: 'date_doc',
         },
     ]
 
-    const onRow = (record: any) => {
+    const onRow = (record: Specialist & { key: number }) => {
         return {
-            onChange: () => {
-                console.log(record)
+            onClick: () => {
+                setPickedSpecialist(record);
             },
             onDoubleClick: () => {
                 setModalType("update")
@@ -124,10 +135,11 @@ const AuthorReviewSpecsPage = () => {
                     setJournalModalOpen(true)
                 }}
                              btnName={"Новая запись"}
-                             refetch={() => {
-                             }}
-                             pickedPerson={"object"} id={0}
-                             deleteFunc={() => {
+                             refetch={() => refetch()}
+                             pickedPerson={"specialist"} id={{id: pickedSpecialist?.specialist_id}}
+                             deleteFunc={async ({id}: {id: number}) => {
+                                 if (!role?.contract_id) return;
+                                 await deleteSpecialist({id, contract_id: role.contract_id});
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -140,16 +152,22 @@ const AuthorReviewSpecsPage = () => {
                                      </div>
                                  </Tooltip>
                              </Popover>}
-                             deleteFuncError={false}
-                             children={<AuthorReviewSpecsModal type={modalType}
-                                                                onClose={() => setJournalModalOpen(false)}
-                                                                isShow={JournalModalOpen}/>}
+                             deleteFuncError={isDeleteError}
+                             pickedRow={pickedSpecialist ?? undefined}
+                             setPickedRow={setPickedSpecialist}
+                             children={<AuthorReviewSpecsModal
+                                 type={modalType}
+                                 onClose={() => setJournalModalOpen(false)}
+                                 isShow={JournalModalOpen}
+                                 picked={pickedSpecialist ?? undefined}
+                             />}
                              deleteEntity={"объект"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
-                    dataSource={[]}
+                    loading={isLoading}
+                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
                             <Table.Summary fixed>

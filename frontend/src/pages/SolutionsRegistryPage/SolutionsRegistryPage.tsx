@@ -10,6 +10,11 @@ import {FaFilter} from "react-icons/fa";
 import type {ColumnType} from "antd/es/table";
 import SolutionsRegistryModal from "@pages/SolutionsRegistryPage/SolutionsRegistryModal.tsx";
 import {roleStore} from "@/store/store.ts";
+import type {TechnicalRegistry} from "@/types/types.ts";
+import {
+    useDeleteTechnicalRegistry,
+    useGetTechnicalRegistriesByContractId
+} from "@/services/api/register-technical-solutions/register-technical-solutions.ts";
 
 const SolutionsRegistryPage = () => {
     document.title = "Реестр технических решений";
@@ -18,52 +23,56 @@ const SolutionsRegistryPage = () => {
     const [JournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
     const [openFilter, setOpenFilter] = useState<boolean>(false);
-    const [form] = useForm()
+    const [form] = useForm();
     const {RangePicker} = DatePicker;
+    const [pickedTechnical, setPickedTechnical] = useState<TechnicalRegistry | null>(null);
 
-    const columns: ColumnType<any>[] = [
+    const {data, isLoading, refetch} = useGetTechnicalRegistriesByContractId(role?.contract_id);
+    const {mutateAsync: deleteTechnical, isError: isDeleteError} = useDeleteTechnicalRegistry();
+
+    const columns: ColumnType<TechnicalRegistry & { key: number }>[] = [
         {
             width: 20,
             align: "center",
             title: '№',
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'key',
+            key: 'key',
         },
         {
             align: "center",
             title: 'Краткое содержание в ЖАНе',
-            dataIndex: 'journal_date',
-            key: 'journal_date',
+            dataIndex: 'reason_change',
+            key: 'reason_change',
         },
         {
             align: "center",
             title: 'Дата записи в ЖАНе',
-            dataIndex: 'journal_date',
-            key: 'journal_date',
+            dataIndex: 'date_solution',
+            key: 'date_solution',
         },
         {
             align: "center",
             title: 'РД (шифр марки)',
-            dataIndex: 'rd_marking',
-            key: 'rd_marking',
+            dataIndex: 'full_brand_code',
+            key: 'full_brand_code',
         },
         {
             align: "center",
             title: 'Причина изменения',
-            dataIndex: 'change_reason',
-            key: 'change_reason',
+            dataIndex: 'reason_change',
+            key: 'reason_change',
         },
         {
             align: "center",
             title: 'Гиперссылка на запись в ЖАНе/дефектную ведомость (Фото)',
-            dataIndex: 'journal_link',
-            key: 'journal_link',
+            dataIndex: 'path_photo_sol',
+            key: 'path_photo_sol',
         },
         {
             align: "center",
             title: 'Статус внесения в РД',
-            dataIndex: 'rd_status',
-            key: 'rd_status',
+            dataIndex: 'status_compliance',
+            key: 'status_compliance',
         },
         {
             align: "center",
@@ -73,10 +82,10 @@ const SolutionsRegistryPage = () => {
         },
     ]
 
-    const onRow = (record: any) => {
+    const onRow = (record: TechnicalRegistry & { key: number }) => {
         return {
-            onChange: () => {
-                console.log(record)
+            onClick: () => {
+                setPickedTechnical(record);
             },
             onDoubleClick: () => {
                 setModalType("update")
@@ -136,10 +145,15 @@ const SolutionsRegistryPage = () => {
                     setJournalModalOpen(true)
                 }}
                              btnName={"Новая запись"}
-                             refetch={() => {
-                             }}
-                             pickedPerson={"object"} id={0}
-                             deleteFunc={() => {
+                             refetch={() => refetch()}
+                             pickedPerson={"technical-registry"}
+                             id={{id: pickedTechnical?.registry_technical_solution_id}}
+                             deleteFunc={async ({id}: {id: number}) => {
+                                 if (!role?.contract_id) return;
+                                 await deleteTechnical({
+                                     registry_technical_solutions: id,
+                                     contract_id: role.contract_id
+                                 });
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -152,16 +166,22 @@ const SolutionsRegistryPage = () => {
                                      </div>
                                  </Tooltip>
                              </Popover>}
-                             deleteFuncError={false}
-                             children={<SolutionsRegistryModal type={modalType}
-                                                               onClose={() => setJournalModalOpen(false)}
-                                                               isShow={JournalModalOpen}/>}
+                             deleteFuncError={isDeleteError}
+                             pickedRow={pickedTechnical ?? undefined}
+                             setPickedRow={setPickedTechnical}
+                             children={<SolutionsRegistryModal
+                                 type={modalType}
+                                 onClose={() => setJournalModalOpen(false)}
+                                 isShow={JournalModalOpen}
+                                 picked={pickedTechnical ?? undefined}
+                             />}
                              deleteEntity={"объект"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
-                    dataSource={[]}
+                    loading={isLoading}
+                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     scroll={{x: 2500}}
                     summary={() => {
                         return (

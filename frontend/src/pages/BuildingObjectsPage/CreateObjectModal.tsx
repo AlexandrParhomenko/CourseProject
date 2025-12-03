@@ -1,28 +1,52 @@
 import {type FC} from "react";
 import {Button, Form, Input, Modal, Select} from "antd";
+import dayjs from "dayjs";
+import {roleStore} from "@/store/store.ts";
+import {useCreateObject} from "@/services/api/objects/objects.ts";
+import type {Object} from "@/types/types.ts";
 
 interface IProps {
     isShow: boolean
-    onClose: Function
+    onClose: () => void
 }
 
 const CreateObjectModal: FC<IProps> = ({isShow, onClose}) => {
-    const onSubmit = () => {
+    const [form] = Form.useForm<Object>();
+    const {role} = roleStore();
+    const {mutateAsync: createObject, isLoading} = useCreateObject();
 
-    }
+    const onSubmit = async (values: Partial<Object>) => {
+        if (!role?.contract_id) return;
+
+        await createObject({
+            contract_id: role.contract_id,
+            number_object: values.number_object,
+            abbreve_name_object: values.abbreve_name_object ?? null,
+            full_name_object: values.full_name_object ?? "",
+        });
+
+        form.resetFields();
+        onClose();
+    };
 
     return (
-        <Modal width={"50%"} footer={false} destroyOnHidden centered onCancel={() => onClose()} open={isShow}>
+        <Modal width={"50%"} footer={false} destroyOnHidden centered onCancel={onClose} open={isShow}>
             <div className={"flex flex-col"}>
                 <span className={"font-bold text-center"}>Новый объект</span>
-                <Form scrollToFirstError={{
+                <Form
+                    form={form}
+                    scrollToFirstError={{
                     behavior: "smooth",
                     block: "center",
                     inline: "center"
-                }} className={"flex items-center flex-col w-full"} onFinish={onSubmit}
-                      layout={"vertical"}>
+                }}
+                    className={"flex items-center flex-col w-full"}
+                    onFinish={onSubmit}
+                    layout={"vertical"}
+                >
                     <Form.Item className={"w-full"}
-                               name={"user_login"}
+                               name={"number_contract"}
+                               initialValue={role?.contract.number_contract}
                                rules={[
                                    {
                                        required: true,
@@ -30,10 +54,10 @@ const CreateObjectModal: FC<IProps> = ({isShow, onClose}) => {
                                    }
                                ]}
                                label={"Номер договора"}>
-                        <Select></Select>
+                        <Select disabled value={role?.contract.number_contract}></Select>
                     </Form.Item>
                     <Form.Item className={"w-full"}
-                               name={"user_login"}
+                               name={"number_object"}
                                rules={[
                                    {
                                        required: true,
@@ -41,23 +65,21 @@ const CreateObjectModal: FC<IProps> = ({isShow, onClose}) => {
                                    }
                                ]}
                                label={"Номер объекта"}>
-                        <Input></Input>
+                        <Input/>
                     </Form.Item>
                     <Form.Item className={"w-full"}
-                               name={"user_login"}
+                               name={"abbreve_name_object"}
                                label={"Сокращенное наименование объекта"}>
-                        <Input></Input>
+                        <Input/>
                     </Form.Item>
                     <Form.Item className={"w-full"}
-                               name={"user_login"}
+                               name={"full_name_object"}
                                label={"Полное наименование объекта"}>
-                        <Input></Input>
+                        <Input/>
                     </Form.Item>
                     <Form.Item>
-                        <Button type={"link"} className={"mr-2"} onClick={() => {
-                            onClose()
-                        }}>Отменить</Button>
-                        <Button htmlType="submit">Сохранить</Button>
+                        <Button type={"link"} className={"mr-2"} onClick={onClose}>Отменить</Button>
+                        <Button htmlType="submit" loading={isLoading}>Сохранить</Button>
                     </Form.Item>
                 </Form>
             </div>

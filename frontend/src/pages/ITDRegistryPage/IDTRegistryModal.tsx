@@ -1,30 +1,67 @@
 import {Button, DatePicker, Form, Input, Modal, Select} from "antd";
 import type {FC} from "react";
 import type {ModalType} from "@typings/types.ts";
+import {roleStore} from "@/store/store.ts";
+import {useCreateRegistry, useUpdateRegistry} from "@/services/api/registry/registry.ts";
+import type {Registry} from "@/types/types.ts";
 
 interface IProps {
     isShow: boolean
-    onClose: Function
+    onClose: () => void
     type: ModalType
+    picked?: Registry
 }
 
-const IDTRegistryModal: FC<IProps> = ({isShow, onClose, type}) => {
-    const onSubmit = () => {
+const IDTRegistryModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
+    const [form] = Form.useForm<Registry>();
+    const {role} = roleStore();
+    const {mutateAsync: createRegistry, isLoading: isCreateLoading} = useCreateRegistry();
+    const {mutateAsync: updateRegistry, isLoading: isUpdateLoading} = useUpdateRegistry();
 
-    }
+    const isUpdate = type === "update" && picked;
+
+    const onSubmit = async (values: Partial<Registry>) => {
+        if (!role?.contract_id) return;
+
+        const payload: Partial<Registry> = {
+            contract_id: role.contract_id,
+            type_work: values.type_work ?? "",
+            type_doc_id: values.type_doc_id!,
+            date_of_review: values.date_of_review ?? null,
+            date_signing_doc: values.date_signing_doc ?? null,
+            path_to_doc_signed: values.path_to_doc_signed ?? null,
+            path_to_doc_with_note: values.path_to_doc_with_note ?? null,
+        };
+
+        if (isUpdate && picked) {
+            await updateRegistry({registry_id: picked.registry_id, data: payload});
+        } else {
+            await createRegistry(payload);
+        }
+
+        form.resetFields();
+        onClose();
+    };
 
     return (
-        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={() => onClose()} open={isShow}>
+        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={onClose} open={isShow}>
             <div className={"flex items-center flex-col justify-center"}>
                 <span className={"font-bold"}>Запись реестра ИТД</span>
-                <Form scrollToFirstError={{
+                <Form
+                    form={form}
+                    initialValues={picked}
+                    scrollToFirstError={{
                     behavior: "smooth",
                     block: "center",
                     inline: "center"
-                }} className={"flex items-center flex-col w-full"} onFinish={onSubmit} layout={"vertical"}>
+                }}
+                    className={"flex items-center flex-col w-full"}
+                    onFinish={onSubmit}
+                    layout={"vertical"}
+                >
                     <div style={{height: "50vh"}} className={"overflow-y-auto w-full"}>
                         <Form.Item className={"w-full"}
-                                   name={"rd_marking"}
+                                   name={"brand_id"}
                                    rules={[
                                        {
                                            required: true,
@@ -35,7 +72,7 @@ const IDTRegistryModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <Select></Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"work_type"}
+                                   name={"type_work"}
                                    rules={[
                                        {
                                            required: true,
@@ -46,7 +83,7 @@ const IDTRegistryModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <Select></Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"document_type"}
+                                   name={"type_doc_id"}
                                    rules={[
                                        {
                                            required: true,
@@ -57,7 +94,7 @@ const IDTRegistryModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <Select></Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"transfer_date"}
+                                   name={"date_of_review"}
                                    rules={[
                                        {
                                            required: true,
@@ -68,26 +105,24 @@ const IDTRegistryModal: FC<IProps> = ({isShow, onClose, type}) => {
                             <DatePicker className={"w-full"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"signing_date"}
+                                   name={"date_signing_doc"}
                                    label={"Подписание документа представителем ПАО \"ОНХП\""}>
                             <DatePicker className={"w-full"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"signed_document_link"}
+                                   name={"path_to_doc_signed"}
                                    label={"Гиперссылка на документ с подписью представителя АН ПАО \"ОНХП\" (при наличии)"}>
                             <Input placeholder={"Введите гиперссылку"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
-                                   name={"comments_document_link"}
+                                   name={"path_to_doc_with_note"}
                                    label={"Гиперссылка на документ с замечаниями представителя АН ПАО \"ОНХП\" (при наличии)"}>
                             <Input placeholder={"Введите гиперссылку"}/>
                         </Form.Item>
                     </div>
                     <Form.Item>
-                        <Button type={"link"} className={"mr-2"} onClick={() => {
-                            onClose()
-                        }}>Отменить</Button>
-                        <Button htmlType="submit">Сохранить</Button>
+                        <Button type={"link"} className={"mr-2"} onClick={onClose}>Отменить</Button>
+                        <Button htmlType="submit" loading={isCreateLoading || isUpdateLoading}>Сохранить</Button>
                     </Form.Item>
                 </Form>
             </div>
