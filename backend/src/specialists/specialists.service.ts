@@ -17,7 +17,7 @@ export class SpecialistsService {
             create_row_datetime: dto.create_row_datetime || new Date()
         };
         const specialist = await this.specialistStorage.create(specialistData);
-        return await this.getSpecialistById(specialist.specialist_id);
+        return await this.getSpecialistById(specialist.dataValues.specialist_id);
     }
 
     async getSpecialistsByContractId(contractId: number) {

@@ -17,7 +17,7 @@ export class UserRoleService {
             create_row_datetime: new Date()
         };
         const user_role = await this.userRoleStorage.create(userRoleData);
-        return await this.getUserRoleById(user_role.user_role_id);
+        return await this.getUserRoleById(user_role.dataValues.user_role_id);
     }
 
     async getUserRoleByUserId(userId: number) {

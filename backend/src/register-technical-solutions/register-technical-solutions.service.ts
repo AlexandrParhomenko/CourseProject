@@ -17,7 +17,7 @@ export class RegisterTechnicalSolutionsService {
             create_row_datetime: new Date()
         };
         const mainJournal = await this.registryStorage.create(mainJournalData);
-        return await this.getRegistryById(mainJournal.main_journal_id);
+        return await this.getRegistryById(mainJournal.dataValues.main_journal_id);
     }
 
     async getRegistryByContractId(contractId: number) {

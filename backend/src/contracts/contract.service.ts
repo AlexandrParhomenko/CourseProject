@@ -17,7 +17,7 @@ export class ContractService {
             deleted: false
         };
         const contract = await this.contractStorage.create(contractData);
-        return await this.getContractById(contract.contract_id);
+        return await this.getContractById(contract.dataValues.contract_id);
     }
 
     async getAllContracts() {

@@ -1,7 +1,6 @@
 import {type FC} from "react";
-import {Button, Form, Input, Modal, Select} from "antd";
-import dayjs from "dayjs";
-import {roleStore} from "@/store/store.ts";
+import {Button, Form, Input, Modal, Select, message} from "antd";
+import {roleStore, useUserStore} from "@/store/store.ts";
 import {useCreateObject} from "@/services/api/objects/objects.ts";
 import type {Object} from "@/types/types.ts";
 
@@ -12,26 +11,37 @@ interface IProps {
 
 const CreateObjectModal: FC<IProps> = ({isShow, onClose}) => {
     const [form] = Form.useForm<Object>();
+    const [messageApi, contextHolder] = message.useMessage();
     const {role} = roleStore();
-    const {mutateAsync: createObject, isLoading} = useCreateObject();
+    const {user} = useUserStore();
+    const {mutateAsync: createObject, isPending} = useCreateObject();
 
     const onSubmit = async (values: Partial<Object>) => {
         if (!role?.contract_id) return;
 
-        await createObject({
-            contract_id: role.contract_id,
-            number_object: values.number_object,
-            abbreve_name_object: values.abbreve_name_object ?? null,
-            full_name_object: values.full_name_object ?? "",
-        });
+        try {
+            await createObject({
+                contract_id: role.contract_id,
+                number_object: values.number_object,
+                abbreve_name_object: values.abbreve_name_object ?? null,
+                full_name_object: values.full_name_object ?? "",
+                create_row_user_id: user?.user_id
+            });
 
-        form.resetFields();
-        onClose();
+            form.resetFields();
+            onClose();
+        } catch (e) {
+            messageApi.open({
+                type: "error",
+                content: "Не удалось сохранить объект. Повторите попытку позже"
+            });
+        }
     };
 
     return (
         <Modal width={"50%"} footer={false} destroyOnHidden centered onCancel={onClose} open={isShow}>
             <div className={"flex flex-col"}>
+                {contextHolder}
                 <span className={"font-bold text-center"}>Новый объект</span>
                 <Form
                     form={form}
@@ -79,7 +89,7 @@ const CreateObjectModal: FC<IProps> = ({isShow, onClose}) => {
                     </Form.Item>
                     <Form.Item>
                         <Button type={"link"} className={"mr-2"} onClick={onClose}>Отменить</Button>
-                        <Button htmlType="submit" loading={isLoading}>Сохранить</Button>
+                        <Button htmlType="submit" loading={isPending}>Сохранить</Button>
                     </Form.Item>
                 </Form>
             </div>

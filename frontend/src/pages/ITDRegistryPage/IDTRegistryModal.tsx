@@ -15,8 +15,8 @@ interface IProps {
 const IDTRegistryModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
     const [form] = Form.useForm<Registry>();
     const {role} = roleStore();
-    const {mutateAsync: createRegistry, isLoading: isCreateLoading} = useCreateRegistry();
-    const {mutateAsync: updateRegistry, isLoading: isUpdateLoading} = useUpdateRegistry();
+    const {mutateAsync: createRegistry, isPending: isCreateLoading} = useCreateRegistry();
+    const {mutateAsync: updateRegistry, isPending: isUpdateLoading} = useUpdateRegistry();
 
     const isUpdate = type === "update" && picked;
 

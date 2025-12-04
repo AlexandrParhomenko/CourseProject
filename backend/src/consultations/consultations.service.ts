@@ -17,7 +17,7 @@ export class ConsultationsService {
             create_row_datetime: dto.create_row_datetime || new Date()
         };
         const consultation = await this.consultationStorage.create(consultationData);
-        return await this.getConsultationById(consultation.consultation_id);
+        return await this.getConsultationById(consultation.dataValues.consultation_id);
     }
 
     async getConsultationsByContractId(contractId: number) {

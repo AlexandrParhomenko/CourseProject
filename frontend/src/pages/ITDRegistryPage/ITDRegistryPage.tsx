@@ -23,14 +23,14 @@ const ItdRegistryPage = () => {
     const [openFilter, setOpenFilter] = useState<boolean>(false);
     const [form] = useForm();
     const {RangePicker} = DatePicker;
-    const [pickedRegistry, setPickedRegistry] = useState<Registry | null>(null);
+    const [pickedRegistry, setPickedRegistry] = useState<Registry>({} as Registry);
 
     const {data, isLoading, refetch} = useGetRegistriesByContractId(role?.contract_id);
     const {mutateAsync: deleteRegistry, isError: isDeleteError} = useDeleteRegistry();
 
     const onRow = (record: Registry & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedRegistry(record);
             },
             onDoubleClick: () => {
@@ -84,14 +84,15 @@ const ItdRegistryPage = () => {
                 <TableHeader handleModalOpen={() => {
                     setModalType("create")
                     setJournalModalOpen(true)
-                }}
+                }} pickedEntity={`id ${pickedRegistry.registry_id}`}
                              btnName={"Новая запись"}
                              refetch={() => refetch()}
                              pickedPerson={"registry"}
-                             id={{id: pickedRegistry?.registry_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
+                             id={pickedRegistry.registry_id}
+                             deleteFunc={async () => {
                                  if (!role?.contract_id) return;
-                                 await deleteRegistry({registry_id: id, contract_id: role.contract_id});
+                                 if (!pickedRegistry.registry_id) return;
+                                 await deleteRegistry({registry_id: pickedRegistry.registry_id, contract_id: role.contract_id});
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -113,7 +114,7 @@ const ItdRegistryPage = () => {
                                  isShow={JournalModalOpen}
                                  picked={pickedRegistry ?? undefined}
                              />}
-                             deleteEntity={"объект"}/>
+                             deleteEntity={"сущность"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
@@ -127,7 +128,7 @@ const ItdRegistryPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

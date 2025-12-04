@@ -1,13 +1,14 @@
 import type {TableColumnsType} from "antd";
 import type {ColumnType} from "antd/es/table";
+import dayjs from "dayjs";
 
 export const itdRegistry: TableColumnsType<any> = [
     {
         width: 20,
         align: "center",
         title: '№',
-        dataIndex: 'dr_school_sname',
-        key: 'dr_school_sname',
+        dataIndex: 'key',
+        key: 'key',
     },
     {
         align: "center",
@@ -18,8 +19,8 @@ export const itdRegistry: TableColumnsType<any> = [
     {
         align: "center",
         title: 'Вид работ',
-        dataIndex: 'dr_school_sname',
-        key: 'dr_school_sname',
+        dataIndex: 'type_work',
+        key: 'type_work',
     },
     {
         align: "center",
@@ -36,14 +37,24 @@ export const itdRegistry: TableColumnsType<any> = [
             {
                 align: "center",
                 title: 'Передача на рассмотрение в ПАО "ОНХП"',
-                dataIndex: 'dr_school_sname',
-                key: 'dr_school_sname',
+                dataIndex: 'date_of_review',
+                key: 'date_of_review',
+                render: (_: any, record) => {
+                    return (
+                      <div>{dayjs(record.date_of_review).format("DD.MM.YYYY")}</div>
+                    )
+                }
             },
             {
                 align: "center",
                 title: 'Подписание документа представителем ПАО "ОНХП"',
-                dataIndex: 'dr_school_sname',
-                key: 'dr_school_sname',
+                dataIndex: 'date_signing_doc',
+                key: 'date_signing_doc',
+                render: (_: any, record) => {
+                    return (
+                      <div>{dayjs(record.date_signing_doc).format("DD.MM.YYYY")}</div>
+                    )
+                }
             }
         ]
     },
@@ -108,8 +119,8 @@ export const supervisionJournalColumns: ColumnType<any>[] = [
         width: 100,
         align: "center",
         title: 'Марка РД',
-        dataIndex: 'phone1',
-        key: 'phone1'
+        dataIndex: 'name_brand',
+        key: 'name_brand'
     },
     {
         width: 100,

@@ -1,7 +1,7 @@
 import {Button, DatePicker, Form, Input, Modal} from "antd";
 import type {FC} from "react";
 import type {ModalType} from "@typings/types.ts";
-import {roleStore} from "@/store/store.ts";
+import {roleStore, useUserStore} from "@/store/store.ts";
 import {useCreateConsultation} from "@/services/api/consultations/consultations.ts";
 import type {Consultation} from "@/types/types.ts";
 
@@ -14,6 +14,7 @@ interface IProps {
 const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
     const [form] = Form.useForm<Consultation>();
     const {role} = roleStore();
+    const {user} = useUserStore();
     const {mutateAsync: createConsultation, isLoading} = useCreateConsultation();
 
     const onSubmit = async (values: Partial<Consultation>) => {
@@ -24,6 +25,7 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
             date_cons: values.date_cons,
             content_cons: values.content_cons ?? "",
             result_cons: values.result_cons ?? "",
+            create_row_user_id: user?.user_id,
         });
 
         form.resetFields();

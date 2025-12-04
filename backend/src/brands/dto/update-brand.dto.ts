@@ -1,5 +1,6 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString} from "class-validator";
+import {IsNull} from "sequelize-typescript";
 
 export class UpdateBrandDto {
     @ApiProperty({example: 1, description: 'ID контракта'})
@@ -27,24 +28,29 @@ export class UpdateBrandDto {
     readonly abbreve_brand_id: number;
 
     @ApiProperty({example: 'Секции', description: 'Секции'})
+    @IsOptional()
     @IsString({message: 'Поле должно быть строкой'})
-    readonly sections: string;
+    readonly sections: string | null;
 
     @ApiProperty({example: 'Подсекции', description: 'Подсекции'})
+    @IsOptional()
     @IsString({message: 'Поле должно быть строкой'})
-    readonly subsection: string;
+    readonly subsection: string | null;
 
     @ApiProperty({example: 'Код', description: 'Код'})
+    @IsOptional()
     @IsString({message: 'Поле должно быть строкой'})
-    readonly full_brand_code: string;
+    readonly full_brand_code: string | null;
 
     @ApiProperty({example: 'Название марки', description: 'Название марки'})
+    @IsOptional()
     @IsString({message: 'Поле должно быть строкой'})
-    readonly name_brand: string;
+    readonly name_brand: string | null;
 
     @ApiProperty({example: "Заметки", description: 'Заметки'})
+    @IsOptional()
     @IsString({message: 'Поле должно быть строкой'})
-    readonly note: string;
+    readonly note: string | null;
 
     @ApiProperty({example: 1, description: 'ID блока'})
     @IsNumber({}, {message: 'Поле должно быть числом'})
@@ -52,7 +58,8 @@ export class UpdateBrandDto {
     readonly block_id: number;
 
     @ApiProperty({example: "Название кода бренда", description: 'Название кода бренда'})
+    @IsOptional()
     @IsString({message: 'Поле должно быть строкой'})
-    readonly full_brand_code_name: string;
+    readonly full_brand_code_name: string | null;
 }
 

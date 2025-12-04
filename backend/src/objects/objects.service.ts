@@ -17,7 +17,7 @@ export class ObjectsService {
             create_row_datetime: dto.create_row_datetime || new Date()
         };
         const object = await this.objectStorage.create(objectData);
-        return await this.getObjectById(object.object_id);
+        return await this.getObjectById(object.dataValues.object_id);
     }
 
     async getObjectsByContractId(contractId: number) {

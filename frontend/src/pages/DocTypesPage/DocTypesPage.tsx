@@ -14,11 +14,9 @@ const DocTypesPage = () => {
     document.title = "Виды документов в составе ИТД";
     const navigate = useNavigate();
     const [isCreateDocType, setIsCreateDocType] = useState<boolean>(false);
-    const [pickedDocType, setPickedDocType] = useState<TypeDoc | null>(null);
-
+    const [pickedDocType, setPickedDocType] = useState<TypeDoc>({} as TypeDoc);
     const {data, isLoading, refetch} = useGetAllTypeDocs();
     const {mutateAsync: deleteTypeDoc, isError: isDeleteError} = useDeleteTypeDoc();
-
     const columns: ColumnType<TypeDoc & { key: number }>[] = [
         {
             width: 100,
@@ -43,7 +41,7 @@ const DocTypesPage = () => {
 
     const onRow = (record: TypeDoc & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedDocType(record);
             },
         };
@@ -57,14 +55,15 @@ const DocTypesPage = () => {
                 <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
-                <TableHeader
+                <TableHeader pickedEntity={pickedDocType.type_doc}
                     handleModalOpen={() => setIsCreateDocType(true)}
                     btnName={"Новая запись"}
                     refetch={() => refetch()}
                     pickedPerson={"type-doc"}
-                    id={{id: pickedDocType?.type_doc_id}}
-                    deleteFunc={async ({id}: { id: number }) => {
-                        await deleteTypeDoc(id);
+                    id={pickedDocType.type_doc_id}
+                    deleteFunc={async () => {
+                        if (!pickedDocType.type_doc_id) return;
+                        await deleteTypeDoc(pickedDocType.type_doc_id);
                     }}
                     deleteFuncError={isDeleteError}
                     pickedRow={pickedDocType ?? undefined}

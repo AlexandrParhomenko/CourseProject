@@ -16,6 +16,7 @@ import {
     useDeleteConsultation,
     useGetConsultationsByContractId
 } from "@/services/api/consultations/consultations.ts";
+import dayjs from "dayjs";
 
 const ConsultationsPage = () => {
     document.title = "Реестр консультаций";
@@ -26,11 +27,9 @@ const ConsultationsPage = () => {
     const [form] = useForm();
     const {RangePicker} = DatePicker;
     const {role} = roleStore();
-    const [pickedConsultation, setPickedConsultation] = useState<Consultation | null>(null);
-
+    const [pickedConsultation, setPickedConsultation] = useState<Consultation>({} as Consultation);
     const {data, isLoading, refetch} = useGetConsultationsByContractId(role?.contract_id);
     const {mutateAsync: deleteConsultation, isError: isDeleteError} = useDeleteConsultation();
-
     const columns: ColumnType<Consultation & { key: number }>[] = [
         {
             width: 20,
@@ -44,6 +43,11 @@ const ConsultationsPage = () => {
             title: 'Дата',
             dataIndex: 'date_cons',
             key: 'date_cons',
+            render: (_: any, record) => {
+                return (
+                  <div>{dayjs(record.date_cons).format("DD.MM.YYYY")}</div>
+                );
+            }
         },
         {
             align: "center",
@@ -61,12 +65,8 @@ const ConsultationsPage = () => {
 
     const onRow = (record: Consultation & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedConsultation(record);
-            },
-            onDoubleClick: () => {
-                setModalType("update")
-                setJournalModalOpen(true)
             }
         };
     };
@@ -109,17 +109,18 @@ const ConsultationsPage = () => {
                 <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
-                <TableHeader handleModalOpen={() => {
+                <TableHeader pickedEntity={pickedConsultation.content_cons} handleModalOpen={() => {
                     setModalType("create")
                     setJournalModalOpen(true)
                 }}
                              btnName={"Новая запись"}
                              refetch={() => refetch()}
                              pickedPerson={"consultation"}
-                             id={{id: pickedConsultation?.consultation_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
+                             id={pickedConsultation.consultation_id}
+                             deleteFunc={async () => {
                                  if (!role?.contract_id) return;
-                                 await deleteConsultation({id, contract_id: role.contract_id});
+                                 if (!pickedConsultation.consultation_id) return;
+                                 await deleteConsultation({id: pickedConsultation.consultation_id, contract_id: role.contract_id});
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -140,7 +141,7 @@ const ConsultationsPage = () => {
                                  onClose={() => setJournalModalOpen(false)}
                                  isShow={JournalModalOpen}
                              />}
-                             deleteEntity={"объект"}/>
+                             deleteEntity={"реестр"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
@@ -153,7 +154,7 @@ const ConsultationsPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

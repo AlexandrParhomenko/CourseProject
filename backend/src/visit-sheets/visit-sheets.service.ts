@@ -19,7 +19,7 @@ export class VisitSheetsService {
             create_row_datetime: dto.create_row_datetime || new Date()
         };
         const visitSheet = await this.visitSheetStorage.create(visitSheetData);
-        return await this.getVisitSheetById(visitSheet.visit_sheet_id);
+        return await this.getVisitSheetById(visitSheet.dataValues.visit_sheet_id);
     }
 
     async getVisitSheetsByContractId(contractId: number) {

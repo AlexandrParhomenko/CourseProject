@@ -15,6 +15,7 @@ import {
     useDeleteTechnicalRegistry,
     useGetTechnicalRegistriesByContractId
 } from "@/services/api/register-technical-solutions/register-technical-solutions.ts";
+import dayjs from "dayjs";
 
 const SolutionsRegistryPage = () => {
     document.title = "Реестр технических решений";
@@ -25,7 +26,7 @@ const SolutionsRegistryPage = () => {
     const [openFilter, setOpenFilter] = useState<boolean>(false);
     const [form] = useForm();
     const {RangePicker} = DatePicker;
-    const [pickedTechnical, setPickedTechnical] = useState<TechnicalRegistry | null>(null);
+    const [pickedTechnical, setPickedTechnical] = useState<TechnicalRegistry>({} as TechnicalRegistry);
 
     const {data, isLoading, refetch} = useGetTechnicalRegistriesByContractId(role?.contract_id);
     const {mutateAsync: deleteTechnical, isError: isDeleteError} = useDeleteTechnicalRegistry();
@@ -49,6 +50,11 @@ const SolutionsRegistryPage = () => {
             title: 'Дата записи в ЖАНе',
             dataIndex: 'date_solution',
             key: 'date_solution',
+            render: (_: any, record) => {
+                return (
+                  <div>{dayjs(record.date_solution).format("DD.MM.YYYY")}</div>
+                )
+            }
         },
         {
             align: "center",
@@ -84,7 +90,7 @@ const SolutionsRegistryPage = () => {
 
     const onRow = (record: TechnicalRegistry & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedTechnical(record);
             },
             onDoubleClick: () => {
@@ -136,22 +142,23 @@ const SolutionsRegistryPage = () => {
         <Flex vertical align={"center"} gap={20} className={"h-screen w-full"}>
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.main)}/>
-                <span className={"font-bold"}>Реестр технических решений разработанных и выданных в рамках АН по договору {role ? role.contract.number_contract : "-"} с последующим внесением в РД</span>
+                <span className={"font-bold"}>Реестр технических решений по договору {role ? role.contract.number_contract : "-"}</span>
                 <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => {
                     setModalType("create")
                     setJournalModalOpen(true)
-                }}
+                }} pickedEntity={pickedTechnical.reason_change}
                              btnName={"Новая запись"}
                              refetch={() => refetch()}
                              pickedPerson={"technical-registry"}
-                             id={{id: pickedTechnical?.registry_technical_solution_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
+                             id={pickedTechnical.registry_technical_solution_id}
+                             deleteFunc={async () => {
                                  if (!role?.contract_id) return;
+                                 if (!pickedTechnical.registry_technical_solution_id) return;
                                  await deleteTechnical({
-                                     registry_technical_solutions: id,
+                                     registry_technical_solutions: pickedTechnical.registry_technical_solution_id,
                                      contract_id: role.contract_id
                                  });
                              }}
@@ -175,7 +182,7 @@ const SolutionsRegistryPage = () => {
                                  isShow={JournalModalOpen}
                                  picked={pickedTechnical ?? undefined}
                              />}
-                             deleteEntity={"объект"}/>
+                             deleteEntity={"решение"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
@@ -189,7 +196,7 @@ const SolutionsRegistryPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

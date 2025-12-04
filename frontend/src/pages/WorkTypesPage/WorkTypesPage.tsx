@@ -13,14 +13,12 @@ const WorkTypesPage = () => {
     document.title = "Перечень основных видов работ";
     const navigate = useNavigate();
     const [isCreateWorkType, setIsCreateWorkType] = useState<boolean>(false);
-    const [pickedTypeWork, setPickedTypeWork] = useState<TypeWork | null>(null);
-
+    const [pickedTypeWork, setPickedTypeWork] = useState<TypeWork>({} as TypeWork);
     const {data, isLoading, refetch} = useGetAllTypeWorks();
     const {mutateAsync: deleteTypeWork, isError: isDeleteError} = useDeleteTypeWork();
-
     const columns: ColumnType<TypeWork & { key: number }>[] = [
         {
-            width: 100,
+            width: 50,
             align: "center",
             title: "№",
             dataIndex: "key",
@@ -54,7 +52,7 @@ const WorkTypesPage = () => {
 
     const onRow = (record: TypeWork & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedTypeWork(record);
             },
         };
@@ -68,14 +66,15 @@ const WorkTypesPage = () => {
                 <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
             </div>
             <div className={"w-full p-6"}>
-                <TableHeader
+            <TableHeader pickedEntity={pickedTypeWork.type_work}
                     handleModalOpen={() => setIsCreateWorkType(true)}
                     btnName={"Новая запись"}
                     refetch={() => refetch()}
                     pickedPerson={"type-work"}
-                    id={{id: pickedTypeWork?.type_work_id}}
-                    deleteFunc={async ({id}: { id: number }) => {
-                        await deleteTypeWork(id);
+                    id={pickedTypeWork.type_work_id}
+                    deleteFunc={async () => {
+                        if (!pickedTypeWork.type_work_id) return;
+                        await deleteTypeWork(pickedTypeWork.type_work_id);
                     }}
                     deleteFuncError={isDeleteError}
                     pickedRow={pickedTypeWork ?? undefined}
@@ -102,9 +101,7 @@ const WorkTypesPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>
-                                        Общее количество записей: {total}
-                                    </Table.Summary.Cell>
+                                    <Table.Summary.Cell index={2}>Общее количество записей: {total}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

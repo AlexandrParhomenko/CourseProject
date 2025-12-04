@@ -15,9 +15,7 @@ const MarkingsShortNamesPage = () => {
     const navigate = useNavigate();
     const [isCreateMarking, setIsCreateMarking] = useState<boolean>(false);
     const [pickedAbbreveBrand, setPickedAbbreveBrand] = useState<AbbreveBrand | null>(null);
-
     const {data, isLoading, refetch} = useGetAllAbbreveBrands();
-
     const columns: ColumnType<AbbreveBrand & { key: number }>[] = [
         {
             width: 100,
@@ -48,7 +46,7 @@ const MarkingsShortNamesPage = () => {
 
     const onRow = (record: AbbreveBrand & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedAbbreveBrand(record);
             },
         };
@@ -62,13 +60,12 @@ const MarkingsShortNamesPage = () => {
                 <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
-                <TableHeader
+                <TableHeader pickedEntity={""}
                     handleModalOpen={() => setIsCreateMarking(true)}
                     btnName={"Новая запись"}
                     refetch={() => refetch()}
                     pickedPerson={"abbreve-brand"}
-                    id={{id: pickedAbbreveBrand?.abbreve_brand_id}}
-                    // В бекенде для abbreve-brand пока нет delete, поэтому заглушка
+                    id={undefined}
                     deleteFunc={async () => {}}
                     deleteFuncError={false}
                     pickedRow={pickedAbbreveBrand ?? undefined}
@@ -80,14 +77,15 @@ const MarkingsShortNamesPage = () => {
                             picked={pickedAbbreveBrand ?? undefined}
                         />
                     }
-                    deleteEntity={"запись"}
+                    deleteEntity={"марку"}
                 />
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 50 }}
                     loading={isLoading}
                     dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
+                    scroll={{ y: "58vh" }}
                     summary={() => {
                         const total = data?.length ?? 0;
                         return (
@@ -95,7 +93,7 @@ const MarkingsShortNamesPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Всего: {total}</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Всего: {total}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

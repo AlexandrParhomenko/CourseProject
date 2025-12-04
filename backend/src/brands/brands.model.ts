@@ -146,6 +146,15 @@ export class Brands extends Model<Brands, CreateBrandDto> {
     @BelongsTo(() => Contract, {foreignKey: 'contract_id', as: 'contract'})
     contract: Contract;
 
+    @BelongsTo(() => ObjectTable, {foreignKey: 'object_id', as: 'object'})
+    object: ObjectTable;
+
+    @BelongsTo(() => Discipline, {foreignKey: 'discipline_id', as: 'discipline'})
+    discipline: Discipline;
+
+    @BelongsTo(() => Block, {foreignKey: 'block_id', as: 'block'})
+    block: Block;
+
     @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'create_row_user'})
     create_row_user: User;
 }

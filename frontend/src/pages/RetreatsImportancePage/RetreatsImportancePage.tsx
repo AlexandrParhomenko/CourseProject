@@ -13,11 +13,9 @@ const RetreatsImportancePage = () => {
     document.title = "Значимость отступления, нарушения";
     const navigate = useNavigate();
     const [isCreateWorkType, setIsCreateWorkType] = useState<boolean>(false);
-    const [pickedDefect, setPickedDefect] = useState<Defect | null>(null);
-
+    const [pickedDefect, setPickedDefect] = useState<Defect>({} as Defect);
     const {data, isLoading, refetch} = useGetAllDefects();
     const {mutateAsync: deleteDefect, isError: isDeleteError} = useDeleteDefect();
-
     const columns: ColumnType<Defect & { key: number }>[] = [
         {
             width: 100,
@@ -42,7 +40,7 @@ const RetreatsImportancePage = () => {
 
     const onRow = (record: Defect & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedDefect(record);
             },
         };
@@ -56,14 +54,15 @@ const RetreatsImportancePage = () => {
                 <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
             </div>
             <div className={"w-full p-6"}>
-                <TableHeader
+                <TableHeader pickedEntity={pickedDefect.importance_defect}
                     handleModalOpen={() => setIsCreateWorkType(true)}
                     btnName={"Новая запись"}
                     refetch={() => refetch()}
                     pickedPerson={"defect"}
-                    id={{id: pickedDefect?.importance_defect_id}}
-                    deleteFunc={async ({id}: { id: number }) => {
-                        await deleteDefect(id);
+                    id={pickedDefect.importance_defect_id}
+                    deleteFunc={async () => {
+                        if (!pickedDefect.importance_defect_id) return;
+                        await deleteDefect(pickedDefect.importance_defect_id);
                     }}
                     deleteFuncError={isDeleteError}
                     pickedRow={pickedDefect ?? undefined}

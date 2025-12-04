@@ -16,7 +16,7 @@ export class DisciplineService {
             create_row_datetime: new Date()
         };
         const consultation = await this.disciplinesStorage.create(consultationData);
-        return await this.getDisciplineById(consultation.discipline_id);
+        return await this.getDisciplineById(consultation.dataValues.discipline_id);
     }
 
     async getDisciplines() {

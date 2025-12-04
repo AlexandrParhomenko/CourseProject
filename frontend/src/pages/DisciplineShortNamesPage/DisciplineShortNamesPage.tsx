@@ -13,11 +13,9 @@ const DisciplineShortNamesPage = () => {
     document.title = "Сокращенное наименование дисциплин";
     const navigate = useNavigate();
     const [isCreateShortName, setIsCreateShortName] = useState<boolean>(false);
-    const [pickedDiscipline, setPickedDiscipline] = useState<Discipline | null>(null);
-
+    const [pickedDiscipline, setPickedDiscipline] = useState<Discipline>({} as Discipline);
     const {data, isLoading, refetch} = useGetAllDisciplines();
     const {mutateAsync: deleteDiscipline, isError: isDeleteError} = useDeleteDiscipline();
-
     const columns: ColumnType<Discipline & { key: number }>[] = [
         {
             width: 100,
@@ -39,10 +37,9 @@ const DisciplineShortNamesPage = () => {
             key: 'discipline'
         }
     ]
-
     const onRow = (record: Discipline & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedDiscipline(record);
             },
             onDoubleClick: () => {
@@ -58,13 +55,14 @@ const DisciplineShortNamesPage = () => {
                 v
             </div>
             <div className={"w-full p-6"}>
-                <TableHeader handleModalOpen={() => setIsCreateShortName(true)}
+                <TableHeader pickedEntity={pickedDiscipline.discipline} handleModalOpen={() => setIsCreateShortName(true)}
                              btnName={"Новая запись"}
                              refetch={() => refetch()}
                              pickedPerson={"discipline"}
-                             id={{id: pickedDiscipline?.discipline_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
-                                 await deleteDiscipline(id);
+                             id={pickedDiscipline.discipline_id}
+                             deleteFunc={async () => {
+                                 if (!pickedDiscipline.discipline_id) return;
+                                 await deleteDiscipline(pickedDiscipline.discipline_id);
                              }}
                              deleteFuncError={isDeleteError}
                              pickedRow={pickedDiscipline ?? undefined}
@@ -74,12 +72,13 @@ const DisciplineShortNamesPage = () => {
                                  isShow={isCreateShortName}
                                  picked={pickedDiscipline ?? undefined}
                              />}
-                             deleteEntity={"объект"}/>
+                             deleteEntity={"наименование"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 50 }}
                     loading={isLoading}
+                    scroll={{ y: "58vh" }}
                     dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
@@ -87,7 +86,7 @@ const DisciplineShortNamesPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Общее количество записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Общее количество записей: {data ? data.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

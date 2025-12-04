@@ -15,11 +15,9 @@ const SrdByBlockPage = () => {
     const navigate = useNavigate();
     const [isCreateSrd, setIsCreateSrd] = useState<boolean>(false);
     const {role} = roleStore();
-    const [pickedBlock, setPickedBlock] = useState<Block | null>(null);
-
+    const [pickedBlock, setPickedBlock] = useState<Block>({} as Block);
     const {data, isLoading, refetch} = useGetBlocksByContractId(role?.contract_id);
     const {mutateAsync: deleteBlock, isError: isDeleteError} = useDeleteBlock();
-
     const columns: ColumnType<Block & { key: number }>[] = [
         {
             width: 100,
@@ -57,7 +55,7 @@ const SrdByBlockPage = () => {
 
     const onRow = (record: Block & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedBlock(record);
             },
             onDoubleClick: () => {
@@ -74,13 +72,14 @@ const SrdByBlockPage = () => {
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => setIsCreateSrd(true)}
-                             btnName={"Новая запись"}
+                             btnName={"Новая запись"} pickedEntity={pickedBlock.name_block}
                              refetch={() => refetch()}
                              pickedPerson={"block"}
-                             id={{id: pickedBlock?.block_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
+                             id={pickedBlock.block_id}
+                             deleteFunc={async () => {
                                  if (!role?.contract_id) return;
-                                 await deleteBlock({id, contract_id: role.contract_id});
+                                 if (!pickedBlock.block_id) return;
+                                 await deleteBlock({id: pickedBlock.block_id, contract_id: role.contract_id});
                              }}
                              deleteFuncError={isDeleteError}
                              pickedRow={pickedBlock ?? undefined}
@@ -90,12 +89,13 @@ const SrdByBlockPage = () => {
                                  isShow={isCreateSrd}
                                  picked={pickedBlock ?? undefined}
                              />}
-                             deleteEntity={"объект"}/>
+                             deleteEntity={"сущность"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 50 }}
                     loading={isLoading}
+                    scroll={{ y: "58vh" }}
                     dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
@@ -103,7 +103,7 @@ const SrdByBlockPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Общее количество записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Общее количество записей: {data ? data.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

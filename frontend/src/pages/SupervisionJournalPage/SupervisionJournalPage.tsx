@@ -15,6 +15,7 @@ import {
     useDeleteMainJournal,
     useGetMainJournalsByContractId
 } from "@/services/api/main-journal/main-journal.ts";
+import dayjs from "dayjs";
 
 const SupervisionJournalPage = () => {
     document.title = "Электронный журнал авторского надзора";
@@ -25,7 +26,7 @@ const SupervisionJournalPage = () => {
     const [openFilter, setOpenFilter] = useState<boolean>(false);
     const [form] = useForm();
     const {RangePicker} = DatePicker;
-    const [pickedMain, setPickedMain] = useState<MainJournal | null>(null);
+    const [pickedMain, setPickedMain] = useState<MainJournal>({} as MainJournal);
 
     const {data, isLoading, refetch} = useGetMainJournalsByContractId(role?.contract_id);
     const {mutateAsync: deleteMainJournal, isError: isDeleteError} = useDeleteMainJournal();
@@ -43,16 +44,19 @@ const SupervisionJournalPage = () => {
             align: "center",
             title: "Дата",
             dataIndex: "date_supervision",
-            key: "date_supervision"
+            key: "date_supervision",
+            render: (_: any, record) => {
+                return (
+                  <div>{dayjs(record.date_supervision).format("DD.MM.YYYY")}</div>
+                );
+            }
         },
         {
-            align: "center",
             title: "Выявленные отступления / нарушения",
             dataIndex: "defects",
             key: "defects"
         },
         {
-            align: "center",
             title: "Указания об устранении",
             dataIndex: "instructions",
             key: "instructions"
@@ -67,7 +71,7 @@ const SupervisionJournalPage = () => {
 
     const onRow = (record: MainJournal & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedMain(record);
             },
             onDoubleClick: () => {
@@ -162,14 +166,15 @@ const SupervisionJournalPage = () => {
                 <TableHeader handleModalOpen={() => {
                     setModalType("create")
                     setJournalModalOpen(true)
-                }}
+                }} pickedEntity={`id ${pickedMain.main_journal_id}`}
                              btnName={"Новая запись"}
                              refetch={() => refetch()}
                              pickedPerson={"main-journal"}
-                             id={{id: pickedMain?.main_journal_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
+                             id={pickedMain.main_journal_id}
+                             deleteFunc={async () => {
                                  if (!role?.contract_id) return;
-                                 await deleteMainJournal({main_journal_id: id, contract_id: role.contract_id});
+                                 if (!pickedMain.main_journal_id) return;
+                                 await deleteMainJournal({main_journal_id: pickedMain.main_journal_id, contract_id: role.contract_id});
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -211,21 +216,21 @@ const SupervisionJournalPage = () => {
                                      picked={pickedMain ?? undefined}
                                  />
                              }
-                             deleteEntity={"объект"}/>
+                             deleteEntity={"элемент журнала"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
                     pagination={false}
                     loading={isLoading}
                     dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
-                    scroll={{x: 4000}}
+                    scroll={{x: 3000}}
                     summary={() => {
                         return (
                             <Table.Summary fixed>
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

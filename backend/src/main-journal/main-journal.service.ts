@@ -17,7 +17,7 @@ export class MainJournalService {
             create_row_datetime: new Date()
         };
         const mainJournal = await this.mainJournalStorage.create(mainJournalData);
-        return await this.getMainJournalById(mainJournal.main_journal_id);
+        return await this.getMainJournalById(mainJournal.dataValues.main_journal_id);
     }
 
     async getMainJournalsByContractId(contractId: number) {

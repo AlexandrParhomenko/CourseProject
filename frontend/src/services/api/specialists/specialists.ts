@@ -47,11 +47,11 @@ export const useUpdateSpecialist = () => {
 
 export const useDeleteSpecialist = () => {
     const queryClient = useQueryClient();
-    return useMutation<Specialist, Error, {id: number; contract_id?: number}>({
-        mutationFn: ({id}) => specialistsApi.delete(id),
-        onSuccess: (_, variables) => {
-            if (variables.contract_id) {
-                queryClient.invalidateQueries({queryKey: ["specialists", variables.contract_id]});
+    return useMutation<Specialist, Error, number >({
+        mutationFn: (id) => specialistsApi.delete(id),
+        onSuccess: (_, id) => {
+            if (id) {
+                queryClient.invalidateQueries({queryKey: ["specialists", id]});
             }
         }
     });

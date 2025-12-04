@@ -25,11 +25,9 @@ const OrganisationsPage = () => {
     const [openFilter, setOpenFilter] = useState<boolean>(false);
     const [form] = useForm();
     const {role} = roleStore();
-    const [pickedContact, setPickedContact] = useState<OrganizationContact | null>(null);
-
+    const [pickedContact, setPickedContact] = useState<OrganizationContact>({} as OrganizationContact);
     const {data, isLoading, refetch} = useGetOrganizationContactsByContractId(role?.contract_id);
     const {mutateAsync: deleteOrganizationContact, isError: isDeleteError} = useDeleteOrganizationContact();
-
     const columns: ColumnType<OrganizationContact & { key: number }>[] = [
         {
             width: 20,
@@ -47,8 +45,8 @@ const OrganisationsPage = () => {
         {
             align: "center",
             title: 'Организация',
-            dataIndex: 'organization_id',
-            key: 'organization_id',
+            dataIndex: 'organization',
+            key: 'organization',
         },
         {
             align: "center",
@@ -78,7 +76,7 @@ const OrganisationsPage = () => {
 
     const onRow = (record: OrganizationContact & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedContact(record);
             },
             onDoubleClick: () => {
@@ -132,15 +130,16 @@ const OrganisationsPage = () => {
                 <TableHeader handleModalOpen={() => {
                     setModalType("create")
                     setJournalModalOpen(true)
-                }}
+                }} pickedEntity={pickedContact.organization}
                              btnName={"Новая запись"}
                              refetch={() => refetch()}
                              pickedPerson={"organization-contact-person"}
-                             id={{id: pickedContact?.organization_contact_person_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
+                             id={pickedContact.organization_contact_person_id}
+                             deleteFunc={async () => {
                                  if (!role?.contract_id) return;
+                                 if (!pickedContact.organization_contact_person_id) return;
                                  await deleteOrganizationContact({
-                                     organization_contact_person_id: id,
+                                     organization_contact_person_id: pickedContact.organization_contact_person_id,
                                      contract_id: role.contract_id
                                  });
                              }}
@@ -164,7 +163,7 @@ const OrganisationsPage = () => {
                                  isShow={JournalModalOpen}
                                  picked={pickedContact ?? undefined}
                              />}
-                             deleteEntity={"объект"}/>
+                             deleteEntity={"организацию"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
@@ -177,7 +176,7 @@ const OrganisationsPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

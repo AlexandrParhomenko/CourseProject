@@ -1,8 +1,8 @@
-import {Button, Form, Input, Modal, Select} from "antd";
-import type {FC} from "react";
+import {Button, Form, Input, Modal, Select, message} from "antd";
+import {type FC, useEffect} from "react";
 import type {ModalType} from "@/types/types.ts";
 import type {Brand} from "@/types/types.ts";
-import {roleStore} from "@/store/store.ts";
+import {roleStore, useUserStore} from "@/store/store.ts";
 import {useCreateBrand, useUpdateBrand} from "@/services/api/brands/brands.ts";
 import {useGetObjectsByContractId} from "@/services/api/objects/objects.ts";
 import {useGetAllDisciplines} from "@/services/api/disciplines/disciplines.ts";
@@ -18,7 +18,9 @@ interface IProps {
 
 const SrdMarkingModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
     const [form] = Form.useForm<Brand>();
+    const [messageApi, contextHolder] = message.useMessage();
     const {role} = roleStore();
+    const {user} = useUserStore();
     const {mutateAsync: createBrand} = useCreateBrand();
     const {mutateAsync: updateBrand} = useUpdateBrand();
     
@@ -28,7 +30,6 @@ const SrdMarkingModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
     const {data: blocks} = useGetBlocksByContractId(role?.contract_id);
 
     const isUpdate = type === "update" && picked;
-
     const onSubmit = async (values: Partial<Brand>) => {
         if (!role?.contract_id) return;
 
@@ -41,26 +42,55 @@ const SrdMarkingModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
             sections: values.sections ?? null,
             subsection: values.subsection ?? null,
             name_brand: values.name_brand ?? null,
+            full_brand_code: values.full_brand_code ?? null,
+            full_brand_code_name: values.full_brand_code_name ?? null,
             note: values.note ?? null,
             block_id: values.block_id ?? null,
+            create_row_user_id: user?.user_id,
         };
 
-        if (isUpdate && picked) {
-            await updateBrand({
-                brand_id: picked.brand_id,
-                data: payload
-            });
-        } else {
-            await createBrand(payload);
-        }
+        try {
+            if (isUpdate && picked) {
+                await updateBrand({
+                    brand_id: picked.brand_id,
+                    data: payload
+                });
+            } else {
+                await createBrand(payload);
+            }
 
-        form.resetFields();
-        onClose();
+            form.resetFields();
+            onClose();
+        } catch (e) {
+            messageApi.open({
+                type: "error",
+                content: "Не удалось сохранить марку. Повторите попытку позже"
+            });
+        }
     }
+
+    useEffect(() => {
+        if (picked && isShow) {
+            form.setFieldsValue({
+                object_id: picked.object_id,
+                title: picked.title,
+                discipline_id: picked.discipline_id,
+                abbreve_brand_id: picked.abbreve_brand_id,
+                sections: picked.sections,
+                subsection: picked.subsection,
+                name_brand: picked.name_brand,
+                full_brand_code: picked.full_brand_code,
+                full_brand_code_name: picked.full_brand_code_name,
+                note: picked.note,
+                block_id: picked.block_id,
+            })
+        }
+    }, [isShow, picked]);
 
     return (
         <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={onClose} open={isShow}>
             <div className={"flex items-center flex-col justify-center"}>
+                {contextHolder}
                 <span className={"font-bold"}>{isUpdate ? "Редактирование марки" : "Новая марка"}</span>
                 <Form
                     form={form}
@@ -167,6 +197,16 @@ const SrdMarkingModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
                                    name={"name_brand"}
                                    label={"Наименование марки"}>
                             <Input placeholder={"Введите наименование марки"}/>
+                        </Form.Item>
+                        <Form.Item className={"w-full"}
+                                   name={"full_brand_code"}
+                                   label={"Полный шифр марки"}>
+                            <Input placeholder={"Введите шифр"}/>
+                        </Form.Item>
+                        <Form.Item className={"w-full"}
+                                   name={"full_brand_code_name"}
+                                   label={"Имя шифра марки"}>
+                            <Input placeholder={"Введите имя шифра"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
                                    name={"note"}

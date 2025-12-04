@@ -17,12 +17,10 @@ const SrdMarkingPage = () => {
     const navigate = useNavigate();
     const [isCreateMarking, setIsCreateMarking] = useState<boolean>(false);
     const [modalType, setModalType] = useState<ModalType>("create");
-    const [pickedBrand, setPickedBrand] = useState<Brand | null>(null);
+    const [pickedBrand, setPickedBrand] = useState<Brand>({} as Brand);
     const {role} = roleStore();
-
     const {data, isLoading, refetch} = useGetBrandsByContractId(role?.contract_id);
     const {mutateAsync: deleteBrand, isError: isDeleteError} = useDeleteBrand();
-
     const columns: ColumnType<Brand & { key: number }>[] = [
         {
             width: 100,
@@ -32,6 +30,7 @@ const SrdMarkingPage = () => {
             key: 'key',
         },
         {
+            width: 200,
             align: "center",
             title: 'Номер договора',
             dataIndex: 'contract',
@@ -46,6 +45,7 @@ const SrdMarkingPage = () => {
             render: (_, record) => record.object?.abbreve_name_object || record.object?.full_name_object || '-'
         },
         {
+            width: 100,
             align: "center",
             title: 'Номер объекта',
             dataIndex: 'object',
@@ -53,12 +53,14 @@ const SrdMarkingPage = () => {
             render: (_, record) => record.object?.number_object || '-'
         },
         {
+            width: 100,
             align: "center",
             title: 'Титул',
             dataIndex: 'title',
             key: 'title'
         },
         {
+            width: 150,
             align: "center",
             title: 'Дисциплина',
             dataIndex: 'discipline',
@@ -66,19 +68,20 @@ const SrdMarkingPage = () => {
             render: (_, record) => record.discipline?.discipline || '-'
         },
         {
-            align: "center",
             title: 'Марка РД',
-            dataIndex: 'abbreve_brand',
-            key: 'abbreve_brand',
-            render: (_, record) => record.abbreve_brand?.abbreve_brand || '-'
+            dataIndex: 'name_brand',
+            key: 'name_brand',
+            render: (_, record) => record.name_brand
         },
         {
+            width: 130,
             align: "center",
             title: 'Секция (СМБ)',
             dataIndex: 'sections',
             key: 'sections'
         },
         {
+            width: 120,
             align: "center",
             title: 'Подсекция',
             dataIndex: 'subsection',
@@ -113,10 +116,11 @@ const SrdMarkingPage = () => {
 
     const onRow = (record: Brand & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedBrand(record);
             },
             onDoubleClick: () => {
+                setPickedBrand(record)
                 setModalType("update");
                 setIsCreateMarking(true);
             }
@@ -134,15 +138,16 @@ const SrdMarkingPage = () => {
                 <TableHeader handleModalOpen={() => {
                     setModalType("create");
                     setIsCreateMarking(true);
-                }}
+                }} pickedEntity={pickedBrand.full_brand_code as string}
                              btnName={"Новая запись"}
                              refetch={() => refetch()}
                              pickedPerson={"brand"}
-                             id={{id: pickedBrand?.brand_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
+                             id={pickedBrand?.brand_id}
+                             deleteFunc={async () => {
                                  if (!role?.contract_id) return;
+                                 if (!pickedBrand?.brand_id) return;
                                  await deleteBrand({
-                                     brand_id: id,
+                                     brand_id: pickedBrand.brand_id,
                                      contract_id: role.contract_id
                                  });
                              }}
@@ -159,7 +164,7 @@ const SrdMarkingPage = () => {
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 25 }}
                     loading={isLoading}
                     dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
@@ -174,7 +179,7 @@ const SrdMarkingPage = () => {
                             </Table.Summary>
                         );
                     }}
-                    scroll={{ x: 3000 }}
+                    scroll={{ x: 4000, y: "58vh" }}
                     columns={columns}/>
             </div>
         </Flex>

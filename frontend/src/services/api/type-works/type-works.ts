@@ -19,7 +19,7 @@ const typeWorksApi = {
 
 export const useGetAllTypeWorks = () => {
     return useQuery<TypeWork[], Error>({
-        queryKey: ["type_works"],
+        queryKey: ["type-works"],
         queryFn: () => typeWorksApi.getAll(),
     });
 };

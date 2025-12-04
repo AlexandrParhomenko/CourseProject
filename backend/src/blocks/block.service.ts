@@ -17,7 +17,7 @@ export class BlockService {
             create_row_datetime: dto.create_row_datetime || new Date()
         };
         const block = await this.blockStorage.create(consultationData);
-        return await this.getBlockById(block.block_id);
+        return await this.getBlockById(block.dataValues.block_id);
     }
 
     async getBlocksByContractId(contractId: number) {

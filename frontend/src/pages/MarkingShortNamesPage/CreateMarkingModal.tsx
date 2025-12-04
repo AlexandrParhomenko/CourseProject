@@ -11,7 +11,6 @@ interface IProps {
 const CreateMarkingModal: FC<IProps> = ({isShow, onClose, picked}) => {
     const [form] = Form.useForm<AbbreveBrand>();
 
-    // В бекенде пока нет POST/PUT для abbreve-brand, поэтому форма только отображает данные / подготавливается под будущее API
     const onSubmit = async () => {
         onClose();
         form.resetFields();

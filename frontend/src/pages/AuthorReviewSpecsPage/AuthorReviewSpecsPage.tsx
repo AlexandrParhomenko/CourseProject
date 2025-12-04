@@ -16,6 +16,7 @@ import {
     useDeleteSpecialist,
     useGetSpecialistsByContractId
 } from "@/services/api/specialists/specialists.ts";
+import dayjs from "dayjs";
 
 const AuthorReviewSpecsPage = () => {
     document.title = "Реестр специалистов авторского надзора";
@@ -25,11 +26,9 @@ const AuthorReviewSpecsPage = () => {
     const [openFilter, setOpenFilter] = useState<boolean>(false);
     const [form] = useForm();
     const {role} = roleStore();
-    const [pickedSpecialist, setPickedSpecialist] = useState<Specialist | null>(null);
-
+    const [pickedSpecialist, setPickedSpecialist] = useState<Specialist>({} as Specialist);
     const {data, isLoading, refetch} = useGetSpecialistsByContractId(role?.contract_id);
     const {mutateAsync: deleteSpecialist, isError: isDeleteError} = useDeleteSpecialist();
-
     const columns: ColumnType<Specialist & { key: number }>[] = [
         {
             width: 20,
@@ -73,12 +72,17 @@ const AuthorReviewSpecsPage = () => {
             title: 'Дата документа о полномочиях по проведению авторского надзора. Приказ от ______.',
             dataIndex: 'date_doc',
             key: 'date_doc',
+            render: (_: any, record) => {
+                return (
+                  <div>{dayjs(record.date_doc).format("DD.MM.YYYY")}</div>
+                )
+            }
         },
     ]
 
     const onRow = (record: Specialist & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedSpecialist(record);
             },
             onDoubleClick: () => {
@@ -130,16 +134,15 @@ const AuthorReviewSpecsPage = () => {
                 <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
-                <TableHeader handleModalOpen={() => {
+                <TableHeader pickedEntity={pickedSpecialist.fullname} handleModalOpen={() => {
                     setModalType("create")
                     setJournalModalOpen(true)
-                }}
-                             btnName={"Новая запись"}
+                }} btnName={"Новая запись"}
                              refetch={() => refetch()}
-                             pickedPerson={"specialist"} id={{id: pickedSpecialist?.specialist_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
+                             pickedPerson={"specialist"} id={pickedSpecialist.specialist_id}
+                             deleteFunc={async () => {
                                  if (!role?.contract_id) return;
-                                 await deleteSpecialist({id, contract_id: role.contract_id});
+                                 await deleteSpecialist(pickedSpecialist.specialist_id);
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -161,7 +164,7 @@ const AuthorReviewSpecsPage = () => {
                                  isShow={JournalModalOpen}
                                  picked={pickedSpecialist ?? undefined}
                              />}
-                             deleteEntity={"объект"}/>
+                             deleteEntity={"специалиста"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
@@ -174,7 +177,7 @@ const AuthorReviewSpecsPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

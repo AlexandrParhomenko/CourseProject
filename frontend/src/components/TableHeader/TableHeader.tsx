@@ -3,6 +3,7 @@ import { Button, message, Popover, Tooltip } from "antd";
 import { FiRefreshCw } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FaFilter } from "react-icons/fa";
+import DeleteConfirmModal from "@components/DeleteConfirmModal/DeleteConfirmModal.tsx";
 
 type ModalProps = {
   children?: ReactNode
@@ -10,17 +11,17 @@ type ModalProps = {
   btnName: string
   refetch: React.MouseEventHandler<HTMLButtonElement>
   pickedPerson: string
-  id: any
+  id: number | undefined
   customComponent?: ReactNode
   deleteFunc: Function
   deleteFuncError: any
   pickedRow?: unknown
-  contractsPage?: boolean
   setPickedRow?: Function
   btnDisabled?: boolean
   deleteHandler?: Function
   actionsDisabled?: boolean
   deleteEntity: string
+  pickedEntity: string
   actionsElems?: ReactNode
   filterOps?: ReactNode
 }
@@ -30,7 +31,6 @@ const CustomTableHeader = ({
                              handleModalOpen,
                              btnName,
                              refetch,
-                             pickedPerson,
                              id,
                              deleteFunc,
                              deleteFuncError,
@@ -39,23 +39,21 @@ const CustomTableHeader = ({
                              btnDisabled,
                              actionsDisabled,
                              customComponent,
-                             pickedRow,
+                             pickedEntity,
                              deleteHandler,
-                             contractsPage,
                              actionsElems,
                              filterOps
                            }: ModalProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [messageApi, contextHolder] = message.useMessage();
-  const [open, setOpen] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const handleDeleteModalOpen = () => setIsDeleteModalOpen(true);
   const handleDeleteModalCancel = () => setIsDeleteModalOpen(false);
   const onClose = () => handleDeleteModalCancel();
   const onDelete = async () => {
     setPickedRow ? setPickedRow({}) : "";
-    await deleteFunc(id);
-    deleteHandler && deleteHandler()
+    await deleteFunc();
+    deleteHandler && deleteHandler();
     handleDeleteModalCancel();
   };
 
@@ -77,6 +75,10 @@ const CustomTableHeader = ({
     <div className={"flex w-full mb-2 rounded-lg px-5"}>
       {contextHolder}
       {children}
+      <DeleteConfirmModal pickedEntity={pickedEntity} isShow={isDeleteModalOpen} onClose={() => {
+        setPickedRow && setPickedRow({})
+        onClose()
+      }} onDelete={onDelete} deleteEntity={deleteEntity}/>
       <div className="flex items-center gap-2 w-full h-15">
         {btnDisabled ? "" : <div onClick={handleModalOpen} className="btn btn--action"><span>{btnName}</span></div>}
         <div className={"flex gap-1"}>
@@ -85,7 +87,7 @@ const CustomTableHeader = ({
               className="filterIcon__image" size={20} /></Button>
           </Tooltip>
           <Tooltip title={"Удалить"} placement={"bottom"}>
-            <Button onClick={handleDeleteModalOpen} disabled={!id.id}
+            <Button onClick={handleDeleteModalOpen} disabled={!id}
                     className="filterIcon"><RiDeleteBin6Line className="filterIcon__image" size={20} /></Button>
           </Tooltip>
         </div>

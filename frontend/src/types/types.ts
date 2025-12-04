@@ -168,6 +168,7 @@ export interface OrganizationContact {
     post: string
     department: string
     phone_number: string
+    organization: string
     create_row_user_id: number
     create_row_datetime: Date | string
     deleted: boolean
@@ -231,6 +232,12 @@ export interface Brand {
     full_brand_code_name?: string | null
     contract?: {
         number_contract: string
+    }
+    object?: Object
+    discipline?: Discipline
+    block?: {
+        block_id: number
+        designation_block: string
     }
     create_row_user?: {
         fullname: string

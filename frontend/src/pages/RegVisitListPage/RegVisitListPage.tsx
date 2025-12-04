@@ -16,6 +16,7 @@ import {
     useDeleteVisitSheet,
     useGetVisitSheetsByContractId
 } from "@/services/api/visit-sheets/visit-sheets.ts";
+import dayjs from "dayjs";
 
 const RegVisitListPage = () => {
     document.title = "Регистрационный лист посещения объекта";
@@ -26,11 +27,9 @@ const RegVisitListPage = () => {
     const [form] = useForm();
     const {RangePicker} = DatePicker;
     const {role} = roleStore();
-    const [pickedVisit, setPickedVisit] = useState<VisitSheet | null>(null);
-
+    const [pickedVisit, setPickedVisit] = useState<VisitSheet>({} as VisitSheet);
     const {data, isLoading, refetch} = useGetVisitSheetsByContractId(role?.contract_id);
     const {mutateAsync: deleteVisitSheet, isError: isDeleteError} = useDeleteVisitSheet();
-
     const columns: ColumnType<VisitSheet & { key: number }>[] = [
         {
             width: 20,
@@ -51,12 +50,22 @@ const RegVisitListPage = () => {
             title: 'Дата приезда',
             dataIndex: 'date_arrival',
             key: 'date_arrival',
+            render: (_: any, record) => {
+                return (
+                  <div>{dayjs(record.date_arrival).format("DD.MM.YYYY")}</div>
+                )
+            }
         },
         {
             align: "center",
             title: 'Дата отъезда',
             dataIndex: 'date_departure',
             key: 'date_departure',
+            render: (_: any, record) => {
+                return (
+                  <div>{dayjs(record.date_departure).format("DD.MM.YYYY")}</div>
+                )
+            }
         },
         {
             align: "center",
@@ -69,7 +78,7 @@ const RegVisitListPage = () => {
 
     const onRow = (record: VisitSheet & { key: number }) => {
         return {
-            onClick: () => {
+            onChange: () => {
                 setPickedVisit(record);
             },
             onDoubleClick: () => {
@@ -120,14 +129,15 @@ const RegVisitListPage = () => {
                 <TableHeader handleModalOpen={() => {
                     setModalType("create")
                     setJournalModalOpen(true)
-                }}
+                }} pickedEntity={dayjs(pickedVisit.date_arrival).format("DD.MM.YYYY")}
                              btnName={"Новая запись"}
                              refetch={() => refetch()}
                              pickedPerson={"visit-sheet"}
-                             id={{id: pickedVisit?.visit_sheet_id}}
-                             deleteFunc={async ({id}: {id: number}) => {
+                             id={pickedVisit.visit_sheet_id}
+                             deleteFunc={async () => {
                                  if (!role?.contract_id) return;
-                                 await deleteVisitSheet({id, contract_id: role.contract_id});
+                                 if (!pickedVisit.visit_sheet_id) return;
+                                 await deleteVisitSheet({id: pickedVisit.visit_sheet_id, contract_id: role.contract_id});
                              }}
                              filterOps={<Popover trigger={"click"}
                                                  content={filterOps}
@@ -149,7 +159,7 @@ const RegVisitListPage = () => {
                                  isShow={JournalModalOpen}
                                  picked={pickedVisit ?? undefined}
                              />}
-                             deleteEntity={"объект"}/>
+                             deleteEntity={"лист посещения от"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
@@ -162,7 +172,7 @@ const RegVisitListPage = () => {
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell index={2}>Записей: 0</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

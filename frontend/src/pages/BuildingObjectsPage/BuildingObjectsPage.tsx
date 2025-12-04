@@ -17,7 +17,7 @@ const BuildingObjectsPage = () => {
   const navigate = useNavigate();
   const [showContracts, setShowContracts] = useState<boolean>(false);
   const [isCreateObject, setIsCreateObject] = useState<boolean>(false);
-  const [pickedObject, setPickedObject] = useState<Object | null>(null);
+  const [pickedObject, setPickedObject] = useState<Object>({} as Object);
   const {role} = roleStore();
   const {data, isLoading, refetch} = useGetObjectsByContractId(role?.contract_id);
   const {mutateAsync: deleteObject, isError: isDeleteError} = useDeleteObject();
@@ -55,19 +55,18 @@ const BuildingObjectsPage = () => {
     {
       align: "center",
       title: 'Полное наименование объекта',
-      dataIndex: 'phone1',
-      key: 'phone1'
+      dataIndex: 'full_name_object',
+      key: 'full_name_object'
     }
   ]
 
   const onRow = (record: Object) => {
     return {
-      onClick: () => {
+      onChange: () => {
         setPickedObject(record);
-      },
+      }
     };
   };
-
   return (
     <Flex vertical align={"center"} gap={20} className={"h-screen w-full"}>
       <ContractsModal isShow={showContracts} onClose={() => setShowContracts(false)}/>
@@ -81,10 +80,11 @@ const BuildingObjectsPage = () => {
                      btnName={"Новая запись"}
                      refetch={() => refetch()}
                      pickedPerson={"object"}
-                     id={{id: pickedObject?.object_id}}
-                     deleteFunc={async ({id}: {id: number}) => {
+                     id={pickedObject.object_id}
+                     deleteFunc={async () => {
                        if (!role?.contract_id) return;
-                       await deleteObject({id, contract_id: role.contract_id});
+                       if (!pickedObject.object_id) return;
+                       await deleteObject({id: pickedObject.object_id, contract_id: role.contract_id});
                      }}
                      deleteFuncError={isDeleteError}
                      pickedRow={pickedObject ?? undefined}
@@ -95,11 +95,11 @@ const BuildingObjectsPage = () => {
                          isShow={isCreateObject}
                        />
                      }
-                     deleteEntity={"объект"}/>
+                     deleteEntity={"объект"} pickedEntity={pickedObject.number_object}/>
         <Table
-          rowSelection={{type: "radio"}}
           onRow={(record) => onRow(record)}
-          pagination={false}
+          rowSelection={{type: "radio"}}
+          pagination={{ position: ["bottomCenter"], defaultPageSize: 25 }}
           loading={isLoading}
           dataSource={data && data.map((el, idx) => ({...el, key: idx + 1}))}
           summary={() => {
@@ -108,7 +108,7 @@ const BuildingObjectsPage = () => {
                 <Table.Summary.Row>
                   <Table.Summary.Cell index={0}></Table.Summary.Cell>
                   <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                  <Table.Summary.Cell index={2}>Всего: 0</Table.Summary.Cell>
+                  <Table.Summary.Cell align={"center"} index={2}>Всего: {data ? data.length : 0}</Table.Summary.Cell>
                 </Table.Summary.Row>
               </Table.Summary>
             );

@@ -16,7 +16,7 @@ export class RegistryService {
             create_row_datetime: new Date()
         };
         const consultation = await this.registryStorage.create(consultationData);
-        return await this.getBrandById(consultation.brand_id);
+        return await this.getBrandById(consultation.dataValues.brand_id);
     }
 
     async getRegistryByContractId(contractId: number) {
