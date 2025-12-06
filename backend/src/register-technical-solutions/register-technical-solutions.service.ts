@@ -16,8 +16,8 @@ export class RegisterTechnicalSolutionsService {
             ...dto,
             create_row_datetime: new Date()
         };
-        const mainJournal = await this.registryStorage.create(mainJournalData);
-        return await this.getRegistryById(mainJournal.dataValues.main_journal_id);
+        const journal = await this.registryStorage.create(mainJournalData);
+        return await this.getRegistryById(journal.dataValues.registry_technical_solution_id);
     }
 
     async getRegistryByContractId(contractId: number) {
@@ -44,7 +44,7 @@ export class RegisterTechnicalSolutionsService {
             ]
         });
         if (!mainJournal) {
-            throw new NotFoundException(`Специалист с ID ${id} не найден`);
+            throw new NotFoundException(`Журнал с ID ${id} не найден`);
         }
         return mainJournal;
     }

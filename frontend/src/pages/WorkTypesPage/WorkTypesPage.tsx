@@ -8,6 +8,7 @@ import TableHeader from "../../components/TableHeader/TableHeader.tsx";
 import WorkTypesModal from "./WorkTypesModal.tsx";
 import type {TypeWork} from "@/types/types.ts";
 import {useDeleteTypeWork, useGetAllTypeWorks} from "@/services/api/type-works/type-works.ts";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const WorkTypesPage = () => {
     document.title = "Перечень основных видов работ";
@@ -63,7 +64,7 @@ const WorkTypesPage = () => {
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.journal_lists)}/>
                 <span className={"font-bold"}>Перечень основных видов работ</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
             <TableHeader pickedEntity={pickedTypeWork.type_work}
@@ -91,7 +92,8 @@ const WorkTypesPage = () => {
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 25 }}
+                    scroll={{ y: "58vh" }}
                     loading={isLoading}
                     dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {

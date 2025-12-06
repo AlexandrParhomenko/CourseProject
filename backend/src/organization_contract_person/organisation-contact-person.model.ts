@@ -80,6 +80,9 @@ export class OrganizationContact extends Model<OrganizationContact, CreateOrgani
     @BelongsTo(() => Contract, {foreignKey: 'contract_id', as: 'contract'})
     contract: Contract;
 
+    @BelongsTo(() => Organization, {foreignKey: 'organization_id', as: 'organization'})
+    organization: Organization;
+
     @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'create_row_user'})
     create_row_user: User;
 }

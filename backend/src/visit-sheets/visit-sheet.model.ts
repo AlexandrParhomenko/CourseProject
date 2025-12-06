@@ -1,9 +1,10 @@
-import {AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table} from "sequelize-typescript";
+import {AutoIncrement, BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 import {CreateVisitSheetDto} from "./dto/create-visit-sheet.dto";
 import {User} from "../users/users.model";
 import {Contract} from "../contracts/contract.model";
 import {Specialist} from "../specialists/specialist.model";
+import {VisitSheetOCP} from "../visit-sheet-organization-contact-person/visit-sheet-ocp.model";
 
 @Table({tableName: "visit_sheet", timestamps: false})
 export class VisitSheet extends Model<VisitSheet, CreateVisitSheetDto> {
@@ -83,5 +84,8 @@ export class VisitSheet extends Model<VisitSheet, CreateVisitSheetDto> {
 
     @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'create_row_user'})
     create_row_user: User;
+
+    @HasMany(() => VisitSheetOCP, {foreignKey: 'visit_sheet_id', as: 'visit_sheet_ocps'})
+    visit_sheet_ocps: VisitSheetOCP[];
 }
 

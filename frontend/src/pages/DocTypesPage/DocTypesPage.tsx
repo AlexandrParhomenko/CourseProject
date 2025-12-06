@@ -80,7 +80,8 @@ const DocTypesPage = () => {
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 25 }}
+                    scroll={{ y: "58vh" }}
                     loading={isLoading}
                     dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {

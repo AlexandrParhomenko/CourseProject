@@ -122,6 +122,12 @@ export class MainJournal extends Model<MainJournal, CreateMainJournalDto> {
     @BelongsTo(() => Contract, {foreignKey: 'contract_id', as: 'contract'})
     contract: Contract;
 
+    @BelongsTo(() => Defect, {foreignKey: 'importance_defect_id', as: 'defect'})
+    defect: Defect;
+
+    @BelongsTo(() => Brands, {foreignKey: 'brand_id', as: 'brand'})
+    brand: Brands;
+
     @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'create_row_user'})
     create_row_user: User;
 }

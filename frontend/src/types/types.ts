@@ -100,6 +100,12 @@ export interface VisitSheet {
     date_departure: Date | string
     create_row_user_id: number
     create_row_datetime: Date | string
+    visit_sheet_ocps: {
+        organization_contact_person_id: number
+        organization_contact_person: {
+            fullname: string
+        }
+    }[]
     deleted: boolean
     contract?: {
         number_contract: string
@@ -285,6 +291,19 @@ export interface MainJournal {
     create_row_user_id: number
     create_row_datetime: Date | string
     deleted: boolean
+    brand: {
+        discipline: {
+            discipline: string
+        }
+        object: {
+            abbreve_name_object: string
+            number_object: string
+        }
+        name_brand: string
+        sections: string
+        subsection: string
+        title: string
+    }
     contract?: {
         number_contract: string
     }

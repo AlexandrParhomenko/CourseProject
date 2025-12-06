@@ -4,6 +4,7 @@ import {CreateRegistryDto} from "./dto/create-registry.dto";
 import {Contract} from "../contracts/contract.model";
 import {User} from "../users/users.model";
 import {TypeDocs} from "../type-docs/type-doc.model";
+import {Brands} from "../brands/brands.model";
 
 @Table({tableName: "registry", timestamps: false})
 export class Registry extends Model<Registry, CreateRegistryDto> {
@@ -106,6 +107,12 @@ export class Registry extends Model<Registry, CreateRegistryDto> {
 
     @BelongsTo(() => Contract, {foreignKey: 'contract_id', as: 'contract'})
     contract: Contract;
+
+    @BelongsTo(() => TypeDocs, {foreignKey: 'type_doc_id', as: 'type_doc'})
+    type_doc: TypeDocs;
+
+    @BelongsTo(() => Brands, {foreignKey: 'brand_id', as: 'brand'})
+    brand: Brands;
 
     @BelongsTo(() => User, {foreignKey: 'create_row_user_id', as: 'create_row_user'})
     create_row_user: User;

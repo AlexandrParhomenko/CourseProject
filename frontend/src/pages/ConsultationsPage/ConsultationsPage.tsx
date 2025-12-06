@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import type {ModalType} from "@typings/types.ts";
 import {useForm} from "antd/es/form/Form";
 import {Button, DatePicker, Flex, Form, Input, Popover, Table, Tooltip} from "antd";
@@ -17,6 +17,7 @@ import {
     useGetConsultationsByContractId
 } from "@/services/api/consultations/consultations.ts";
 import dayjs from "dayjs";
+import type {Dayjs} from "dayjs";
 
 const ConsultationsPage = () => {
     document.title = "Реестр консультаций";
@@ -30,6 +31,11 @@ const ConsultationsPage = () => {
     const [pickedConsultation, setPickedConsultation] = useState<Consultation>({} as Consultation);
     const {data, isLoading, refetch} = useGetConsultationsByContractId(role?.contract_id);
     const {mutateAsync: deleteConsultation, isError: isDeleteError} = useDeleteConsultation();
+    const [filters, setFilters] = useState<{
+        date_cons?: [Dayjs, Dayjs] | null;
+        content_cons?: string;
+        result_cons?: string;
+    }>({});
     const columns: ColumnType<Consultation & { key: number }>[] = [
         {
             width: 20,
@@ -71,13 +77,55 @@ const ConsultationsPage = () => {
         };
     };
 
+    const filteredData = useMemo(() => {
+        if (!data) return [];
+        
+        return data.filter((consultation) => {
+            // Фильтр по дате
+            if (filters.date_cons && filters.date_cons[0] && filters.date_cons[1]) {
+                const consultationDate = dayjs(consultation.date_cons);
+                const startDate = filters.date_cons[0].startOf('day');
+                const endDate = filters.date_cons[1].endOf('day');
+                if (consultationDate.isBefore(startDate) || consultationDate.isAfter(endDate)) {
+                    return false;
+                }
+            }
+            
+            // Фильтр по содержанию обращения
+            if (filters.content_cons && filters.content_cons.trim()) {
+                const content = consultation.content_cons?.toLowerCase() || '';
+                const filterValue = filters.content_cons.toLowerCase().trim();
+                if (!content.includes(filterValue)) {
+                    return false;
+                }
+            }
+            
+            // Фильтр по результату рассмотрения
+            if (filters.result_cons && filters.result_cons.trim()) {
+                const result = consultation.result_cons?.toLowerCase() || '';
+                const filterValue = filters.result_cons.toLowerCase().trim();
+                if (!result.includes(filterValue)) {
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+    }, [data, filters]);
+
     const filterOps = (
         <div className={"w-full p-2"}>
             <Form form={form} scrollToFirstError={{
                 behavior: "smooth",
                 block: "center",
                 inline: "center"
-            }} onFinish={() => {
+            }} onFinish={(values) => {
+                setFilters({
+                    date_cons: values.date_cons || null,
+                    content_cons: values.content_cons || undefined,
+                    result_cons: values.result_cons || undefined,
+                });
+                setOpenFilter(false);
             }} layout="vertical" className="flex items-center flex-col gap-1">
                 <div className={"w-[400px]"}>
                     <Form.Item name={"date_cons"} label={"Дата"}>
@@ -91,8 +139,9 @@ const ConsultationsPage = () => {
                     </Form.Item>
                 </div>
                 <Form.Item>
-                    <Button htmlType="submit" type={"link"} className={"mr-2"} onClick={() => {
+                    <Button htmlType="button" type={"link"} className={"mr-2"} onClick={() => {
                         form.resetFields();
+                        setFilters({});
                         setOpenFilter(false);
                     }}>Сбросить</Button>
                     <Button htmlType="submit">Применить</Button>
@@ -138,23 +187,27 @@ const ConsultationsPage = () => {
                              setPickedRow={setPickedConsultation}
                              children={<ConsultationsModal
                                  type={modalType}
-                                 onClose={() => setJournalModalOpen(false)}
+                                 onClose={() => {
+                                     setPickedConsultation({} as Consultation)
+                                     setJournalModalOpen(false)
+                                 }}
                                  isShow={JournalModalOpen}
                              />}
                              deleteEntity={"реестр"}/>
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 25 }}
+                    scroll={{ y: "58vh" }}
                     loading={isLoading}
-                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
+                    dataSource={filteredData.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
                             <Table.Summary fixed>
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {filteredData.length}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

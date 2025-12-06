@@ -6,6 +6,8 @@ import {UpdateVisitSheetDto} from "./dto/update-visit-sheet.dto";
 import {User} from "../users/users.model";
 import {Contract} from "../contracts/contract.model";
 import {Specialist} from "../specialists/specialist.model";
+import {VisitSheetOCP} from "../visit-sheet-organization-contact-person/visit-sheet-ocp.model";
+import {OrganizationContact} from "../organization_contract_person/organisation-contact-person.model";
 
 @Injectable()
 export class VisitSheetsService {
@@ -30,6 +32,16 @@ export class VisitSheetsService {
             },
             include: [
                 {model: Specialist, as: 'specialist', attributes: ['fullname']},
+                {
+                    model: VisitSheetOCP,
+                    as: 'visit_sheet_ocps',
+                    where: {deleted: false},
+                    required: false,
+                    attributes: ['organization_contact_person_id'],
+                    include: [
+                        {model: OrganizationContact, as: 'organization_contact_person', attributes: ['organization_contact_person_id', 'fullname']}
+                    ]
+                }
             ],
             order: [['visit_sheet_id', 'DESC']]
         });

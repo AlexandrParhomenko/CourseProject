@@ -13,8 +13,8 @@ export const itdRegistry: TableColumnsType<any> = [
     {
         align: "center",
         title: 'Марка РД, которой соответствует ИТД',
-        dataIndex: 'dr_school_sname',
-        key: 'dr_school_sname',
+        dataIndex: 'brand',
+        key: 'brand',
     },
     {
         align: "center",
@@ -25,8 +25,8 @@ export const itdRegistry: TableColumnsType<any> = [
     {
         align: "center",
         title: 'Вид документа в составе ИТД (АОК, АОСР, ...)',
-        dataIndex: 'dr_school_sname',
-        key: 'dr_school_sname',
+        dataIndex: 'type_doc',
+        key: 'type_doc',
     },
     {
         align: "center",
@@ -61,14 +61,14 @@ export const itdRegistry: TableColumnsType<any> = [
     {
         align: "center",
         title: 'Гиперссылка на документ с подписью представителя АН ПАО "ОНХП" (при наличии)',
-        dataIndex: 'dr_school_sname',
-        key: 'dr_school_sname',
+        dataIndex: 'path_to_doc_signed',
+        key: 'path_to_doc_signed',
     },
     {
         align: "center",
         title: 'Гиперссылка на документ с замечаниями представителя АН ПАО "ОНХП" (при наличии)',
-        dataIndex: 'dr_school_sname',
-        key: 'dr_school_sname',
+        dataIndex: 'path_to_doc_with_note',
+        key: 'path_to_doc_with_note',
     }
 ]
 

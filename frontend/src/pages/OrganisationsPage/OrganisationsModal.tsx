@@ -1,12 +1,13 @@
 import {Button, Form, Input, Modal, Select} from "antd";
-import type {FC} from "react";
+import {type FC, useEffect} from "react";
 import type {ModalType} from "@typings/types.ts";
-import {roleStore} from "@/store/store.ts";
+import {roleStore, useUserStore} from "@/store/store.ts";
 import {
     useCreateOrganizationContact,
     useUpdateOrganizationContact
 } from "@/services/api/organization-contact-person/organization-contact-person.ts";
 import type {OrganizationContact} from "@/types/types.ts";
+import {useGetOrganizationsByContractId} from "@/services/api/organisations/organisations.ts";
 
 interface IProps {
     isShow: boolean
@@ -18,8 +19,10 @@ interface IProps {
 const OrganisationsModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
     const [form] = Form.useForm<OrganizationContact>();
     const {role} = roleStore();
+    const {user} = useUserStore();
     const {mutateAsync: createContact} = useCreateOrganizationContact();
     const {mutateAsync: updateContact} = useUpdateOrganizationContact();
+    const {data: organizations} = useGetOrganizationsByContractId(role?.contract_id);
 
     const isUpdate = type === "update" && picked;
 
@@ -28,11 +31,13 @@ const OrganisationsModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
 
         const payload: Partial<OrganizationContact> = {
             contract_id: role.contract_id,
-            project_participants: values.project_participants ?? "",
-            fullname: values.fullname ?? "",
-            post: values.post ?? "",
-            department: values.department ?? "",
-            phone_number: values.phone_number ?? "",
+            project_participants: values.project_participants,
+            fullname: values.fullname,
+            post: values.post,
+            organization_id: values.organization_id,
+            department: values.department,
+            phone_number: values.phone_number,
+            create_row_user_id: user?.user_id,
         };
 
         if (isUpdate && picked) {
@@ -48,13 +53,28 @@ const OrganisationsModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
         onClose();
     };
 
+    useEffect(() => {
+        if (isShow && picked && type === "update") {
+            form.setFieldsValue({
+                project_participants: picked.project_participants,
+                organization_id: picked.organization_id,
+                fullname: picked.fullname,
+                post: picked.post,
+                department: picked.department,
+                phone_number: picked.phone_number
+            })
+        }
+    }, [isShow]);
+
     return (
-        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={onClose} open={isShow}>
+        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={() => {
+            form.resetFields()
+            onClose()
+        }} open={isShow}>
             <div className={"flex items-center flex-col justify-center"}>
                 <span className={"font-bold"}>Запись реестра организаций</span>
                 <Form
                     form={form}
-                    initialValues={picked}
                     scrollToFirstError={{
                     behavior: "smooth",
                     block: "center",
@@ -76,11 +96,11 @@ const OrganisationsModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
                                    rules={[
                                        {
                                            required: true,
-                                           message: "Выберите участника проекта"
+                                           message: "Введите участника проекта"
                                        }
                                    ]}
                                    label={"Участник проекта"}>
-                            <Select placeholder={"Выберите участника проекта"}></Select>
+                            <Input placeholder={"Введите участника проекта"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
                                    name={"organization_id"}
@@ -91,7 +111,9 @@ const OrganisationsModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
                                        }
                                    ]}
                                    label={"Организация"}>
-                            <Input placeholder={"Введите организацию"}/>
+                            <Select>
+                                {organizations && organizations.map((el, idx) => <Select.Option value={el.organization_id} key={idx}>{el.organization}</Select.Option>)}
+                            </Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
                                    name={"fullname"}
@@ -116,12 +138,24 @@ const OrganisationsModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
                             <Input placeholder={"Введите должность"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
+                                   rules={[
+                                       {
+                                           required: true,
+                                           message: "Введите подразделение"
+                                       }
+                                   ]}
                                    name={"department"}
                                    label={"Подразделение"}>
                             <Input placeholder={"Введите подразделение"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}
                                    name={"phone_number"}
+                                   rules={[
+                                       {
+                                           required: true,
+                                           message: "Введите номер телефона"
+                                       }
+                                   ]}
                                    label={"Контактный номер"}>
                             <Input placeholder={"Введите контактный номер"}/>
                         </Form.Item>

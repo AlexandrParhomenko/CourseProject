@@ -1,17 +1,18 @@
 import {useNavigate} from "react-router-dom";
 import routes from "@router/routes.ts";
-import {useUserStore} from "@/store/store.ts";
+import {roleStore, useUserStore} from "@/store/store.ts";
 import {getAbbreName} from "@/utils.ts";
 import {Flex} from "antd";
 
 const ExitBtn = () => {
     const navigate = useNavigate();
-    const {user} = useUserStore();
-    const { clearUser } = useUserStore();
+    const {user, clearUser} = useUserStore();
+    const { clearRole } = roleStore();
     return (
       <Flex gap={20}>
         {user && <span className={"font-bold duration-300"}>{getAbbreName(user.fullname)}</span>}
         <span onClick={() => {
+          clearRole()
           clearUser()
           sessionStorage.removeItem("token")
           navigate(routes.auth)

@@ -19,40 +19,36 @@ export class CreateRegisterTechnicalSolutionsDto {
     @ApiProperty({example: "2024-01-01", description: 'Дата'})
     @IsDateString({}, {message: 'Поле должно быть валидной датой'})
     @IsNotEmpty({message: 'Поле не может быть пустым'})
-    readonly date_supervision: Date;
+    readonly date_solution: Date;
 
-    @ApiProperty({example: 1, description: 'ID бренда'})
+    @ApiProperty({example: 1, description: 'ID журнала'})
     @IsNumber({}, {message: 'Поле должно быть числом'})
     @IsNotEmpty({message: 'Поле не может быть пустым'})
-    readonly brand_id: number;
+    readonly main_journal_id: number;
 
     @ApiProperty({example: "Отклонения", description: 'Отклонения'})
     @IsString({message: 'Поле должно быть строкой'})
-    readonly defects: string;
+    readonly full_brand_code: string;
 
     @ApiProperty({example: "Инструкции", description: 'Инструкции'})
+    @IsOptional()
     @IsString({message: 'Поле должно быть строкой'})
-    readonly instructions: string;
-
-    @ApiProperty({example: 1, description: 'ID нарушения'})
-    @IsNumber({}, {message: 'Поле должно быть числом'})
-    readonly importance_defect_id: number;
-
-    @ApiProperty({example: 1, description: 'ID листа'})
-    @IsNumber({}, {message: 'Поле должно быть числом'})
-    readonly visit_sheet_id: number;
+    readonly reason_change: string | null;
 
     @ApiProperty({example: "Инструкции", description: 'Инструкции'})
+    @IsOptional()
     @IsString({message: 'Поле должно быть строкой'})
-    readonly deadline_eliminate: string;
+    readonly path_photo_sol: string | null;
 
-    @ApiProperty({example: 1, description: 'ID листа'})
-    @IsNumber({}, {message: 'Поле должно быть числом'})
-    readonly organization_id: number;
+    @ApiProperty({example: "Инструкции", description: 'Инструкции'})
+    @IsOptional()
+    @IsString({message: 'Поле должно быть строкой'})
+    readonly status_compliance: string | null;
 
-    @ApiProperty({example: false, description: 'Устранено'})
-    @IsBoolean({message: 'Поле должно быть boolean'})
-    readonly elimination: boolean;
+    @ApiProperty({example: "Инструкции", description: 'Инструкции'})
+    @IsOptional()
+    @IsString({message: 'Поле должно быть строкой'})
+    readonly note: string | null;
 
     @ApiProperty({example: 1, description: 'ID пользователя, создающего запись'})
     @IsNumber({}, {message: 'Поле должно быть числом'})

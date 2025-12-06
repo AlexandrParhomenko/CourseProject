@@ -21,9 +21,9 @@ export class ApiClient {
         options: RequestInit = {}
     ): Promise<T> {
         const token = this.getAuthToken();
-        const headers: HeadersInit = {
+        const headers: Record<string, string> = {
             'Content-Type': 'application/json',
-            ...options.headers,
+            ...(options.headers as Record<string, string>),
         };
 
         if (token) {
@@ -39,7 +39,10 @@ export class ApiClient {
         if (response.status === 401) {
             sessionStorage.removeItem("token");
             localStorage.removeItem("token");
-            window.location.href = '/';
+            // Не делаем редирект при ошибке авторизации на странице входа
+            if (!endpoint.includes('/auth/login')) {
+                window.location.href = '/';
+            }
             throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
         }
 

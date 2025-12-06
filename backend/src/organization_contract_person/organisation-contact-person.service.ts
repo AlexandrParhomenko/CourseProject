@@ -3,6 +3,8 @@ import {InjectModel} from "@nestjs/sequelize";
 import {CreateOrganisationContactPersonDto} from "./dto/create-organisation-contact-person.dto";
 import {UpdateOrganisationContactPersonDto} from "./dto/update-organisation-contact-person.dto";
 import {OrganizationContact} from "./organisation-contact-person.model";
+import {User} from "../users/users.model";
+import {Organization} from "../organisations/organisation.model";
 
 @Injectable()
 export class OrganisationContactPersonService {
@@ -20,12 +22,22 @@ export class OrganisationContactPersonService {
     }
 
     async getOrganisationsContactsByContractId(contractId: number) {
-        return await this.organisationContactStorage.findAll({
+        const contacts =  await this.organisationContactStorage.findAll({
             where: {
                 deleted: false,
                 contract_id: contractId
             },
+            include: [
+                {model: Organization, as: 'organization', attributes: ["organization"]},
+            ],
             order: [['organization_contact_person_id', 'DESC']]
+        });
+        return contacts.map(contact => {
+            const plainContact = contact.get({ plain: true });
+            return {
+                ...plainContact,
+                organization: plainContact.organization?.organization || null
+            };
         });
     }
 

@@ -46,10 +46,6 @@ export class CreateMainJournalDto {
     @IsString({message: 'Поле должно быть строкой'})
     readonly deadline_eliminate: string;
 
-    @ApiProperty({example: 1, description: 'ID листа'})
-    @IsNumber({}, {message: 'Поле должно быть числом'})
-    readonly organization_id: number;
-
     @ApiProperty({example: false, description: 'Устранено'})
     @IsBoolean({message: 'Поле должно быть boolean'})
     readonly elimination: boolean;

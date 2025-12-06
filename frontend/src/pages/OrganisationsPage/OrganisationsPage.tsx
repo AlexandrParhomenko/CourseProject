@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useState, useMemo} from "react";
 import type {ModalType} from "@typings/types.ts";
 import {useForm} from "antd/es/form/Form";
 import {Button, Flex, Form, Input, Popover, Table, Tooltip} from "antd";
@@ -26,11 +26,17 @@ const OrganisationsPage = () => {
     const [form] = useForm();
     const {role} = roleStore();
     const [pickedContact, setPickedContact] = useState<OrganizationContact>({} as OrganizationContact);
+    const [filters, setFilters] = useState<{
+        project_participant?: string;
+        organisation?: string;
+        contact_fio?: string;
+        position?: string;
+    }>({});
     const {data, isLoading, refetch} = useGetOrganizationContactsByContractId(role?.contract_id);
     const {mutateAsync: deleteOrganizationContact, isError: isDeleteError} = useDeleteOrganizationContact();
     const columns: ColumnType<OrganizationContact & { key: number }>[] = [
         {
-            width: 20,
+            width: 50,
             align: "center",
             title: '№',
             dataIndex: 'key',
@@ -80,11 +86,52 @@ const OrganisationsPage = () => {
                 setPickedContact(record);
             },
             onDoubleClick: () => {
+                setPickedContact(record);
                 setModalType("update")
                 setJournalModalOpen(true)
             }
         };
     };
+
+    const filteredData = useMemo(() => {
+        if (!data) return [];
+        
+        return data.filter((record) => {
+            // Фильтр по участникам проекта
+            if (filters.project_participant) {
+                const projectParticipants = record.project_participants || "";
+                if (!projectParticipants.toLowerCase().includes(filters.project_participant.toLowerCase())) {
+                    return false;
+                }
+            }
+            
+            // Фильтр по организации
+            if (filters.organisation) {
+                const organization = record.organization || "";
+                if (!organization.toLowerCase().includes(filters.organisation.toLowerCase())) {
+                    return false;
+                }
+            }
+            
+            // Фильтр по ФИО контактного лица
+            if (filters.contact_fio) {
+                const fullname = record.fullname || "";
+                if (!fullname.toLowerCase().includes(filters.contact_fio.toLowerCase())) {
+                    return false;
+                }
+            }
+            
+            // Фильтр по должности
+            if (filters.position) {
+                const post = record.post || "";
+                if (!post.toLowerCase().includes(filters.position.toLowerCase())) {
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+    }, [data, filters]);
 
     const filterOps = (
         <div className={"w-full p-2"}>
@@ -92,7 +139,14 @@ const OrganisationsPage = () => {
                 behavior: "smooth",
                 block: "center",
                 inline: "center"
-            }} onFinish={() => {
+            }} onFinish={(values) => {
+                setFilters({
+                    project_participant: values.project_participant || undefined,
+                    organisation: values.organisation || undefined,
+                    contact_fio: values.contact_fio || undefined,
+                    position: values.position || undefined,
+                });
+                setOpenFilter(false);
             }} layout="vertical" className="flex items-center flex-col gap-1">
                 <div className={"w-[400px]"}>
                     <Form.Item name={"project_participant"} label={"Участники проекта"}>
@@ -109,8 +163,9 @@ const OrganisationsPage = () => {
                     </Form.Item>
                 </div>
                 <Form.Item>
-                    <Button htmlType="submit" type={"link"} className={"mr-2"} onClick={() => {
+                    <Button htmlType="button" type={"link"} className={"mr-2"} onClick={() => {
                         form.resetFields();
+                        setFilters({});
                         setOpenFilter(false);
                     }}>Сбросить</Button>
                     <Button htmlType="submit">Применить</Button>
@@ -159,7 +214,10 @@ const OrganisationsPage = () => {
                              setPickedRow={setPickedContact}
                              children={<OrganisationsModal
                                  type={modalType}
-                                 onClose={() => setJournalModalOpen(false)}
+                                 onClose={() => {
+                                     setJournalModalOpen(false)
+                                     setPickedContact({} as OrganizationContact)
+                                 }}
                                  isShow={JournalModalOpen}
                                  picked={pickedContact ?? undefined}
                              />}
@@ -167,16 +225,17 @@ const OrganisationsPage = () => {
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 25 }}
+                    scroll={{y: "58vh"}}
                     loading={isLoading}
-                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
+                    dataSource={filteredData && filteredData.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
                             <Table.Summary fixed>
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {filteredData ? filteredData.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

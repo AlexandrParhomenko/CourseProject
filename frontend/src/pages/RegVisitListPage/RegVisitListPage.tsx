@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useState, useMemo} from "react";
 import type {ModalType} from "@typings/types.ts";
 import {useForm} from "antd/es/form/Form";
 import {Button, DatePicker, Flex, Form, Input, Popover, Table, Tooltip} from "antd";
@@ -16,7 +16,7 @@ import {
     useDeleteVisitSheet,
     useGetVisitSheetsByContractId
 } from "@/services/api/visit-sheets/visit-sheets.ts";
-import dayjs from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
 
 const RegVisitListPage = () => {
     document.title = "Регистрационный лист посещения объекта";
@@ -28,6 +28,11 @@ const RegVisitListPage = () => {
     const {RangePicker} = DatePicker;
     const {role} = roleStore();
     const [pickedVisit, setPickedVisit] = useState<VisitSheet>({} as VisitSheet);
+    const [filters, setFilters] = useState<{
+        fio?: string;
+        arrival_date?: [Dayjs | null, Dayjs | null] | null;
+        departure_date?: [Dayjs | null, Dayjs | null] | null;
+    }>({});
     const {data, isLoading, refetch} = useGetVisitSheetsByContractId(role?.contract_id);
     const {mutateAsync: deleteVisitSheet, isError: isDeleteError} = useDeleteVisitSheet();
     const columns: ColumnType<VisitSheet & { key: number }>[] = [
@@ -68,11 +73,14 @@ const RegVisitListPage = () => {
             }
         },
         {
-            align: "center",
             title: 'Контактирующие лица',
             dataIndex: 'contact_persons',
             key: 'contact_persons',
-            render: () => null,
+            render: (_: any, record) => {
+                return (
+                  <div>{record.visit_sheet_ocps?.map(el => el.organization_contact_person.fullname).join(", ") || ""}</div>
+                )
+            }
         },
     ]
 
@@ -82,11 +90,48 @@ const RegVisitListPage = () => {
                 setPickedVisit(record);
             },
             onDoubleClick: () => {
+                setPickedVisit(record)
                 setModalType("update")
                 setJournalModalOpen(true)
             }
         };
     };
+
+    const filteredData = useMemo(() => {
+        if (!data) return [];
+        
+        return data.filter((record) => {
+            // Фильтр по ФИО
+            if (filters.fio) {
+                const fullname = record.specialist?.fullname || "";
+                if (!fullname.toLowerCase().includes(filters.fio.toLowerCase())) {
+                    return false;
+                }
+            }
+            
+            // Фильтр по дате приезда
+            if (filters.arrival_date && filters.arrival_date[0] && filters.arrival_date[1]) {
+                const arrivalDate = dayjs(record.date_arrival);
+                const startDate = filters.arrival_date[0].startOf('day');
+                const endDate = filters.arrival_date[1].endOf('day');
+                if (arrivalDate.isBefore(startDate) || arrivalDate.isAfter(endDate)) {
+                    return false;
+                }
+            }
+            
+            // Фильтр по дате отъезда
+            if (filters.departure_date && filters.departure_date[0] && filters.departure_date[1]) {
+                const departureDate = dayjs(record.date_departure);
+                const startDate = filters.departure_date[0].startOf('day');
+                const endDate = filters.departure_date[1].endOf('day');
+                if (departureDate.isBefore(startDate) || departureDate.isAfter(endDate)) {
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+    }, [data, filters]);
 
     const filterOps = (
         <div className={"w-full p-2"}>
@@ -94,7 +139,13 @@ const RegVisitListPage = () => {
                 behavior: "smooth",
                 block: "center",
                 inline: "center"
-            }} onFinish={() => {
+            }} onFinish={(values) => {
+                setFilters({
+                    fio: values.fio || undefined,
+                    arrival_date: values.arrival_date || undefined,
+                    departure_date: values.departure_date || undefined,
+                });
+                setOpenFilter(false);
             }} layout="vertical" className="flex items-center flex-col gap-1">
                 <div className={"w-[400px]"}>
                     <Form.Item name={"fio"} label={"ФИО"}>
@@ -108,8 +159,10 @@ const RegVisitListPage = () => {
                     </Form.Item>
                 </div>
                 <Form.Item>
-                    <Button htmlType="submit" type={"link"} className={"mr-2"} onClick={() => {
+                    <Button htmlType="button" type={"link"} className={"mr-2"} onClick={() => {
+                        setPickedVisit({} as VisitSheet)
                         form.resetFields();
+                        setFilters({});
                         setOpenFilter(false);
                     }}>Сбросить</Button>
                     <Button htmlType="submit">Применить</Button>
@@ -132,7 +185,7 @@ const RegVisitListPage = () => {
                 }} pickedEntity={dayjs(pickedVisit.date_arrival).format("DD.MM.YYYY")}
                              btnName={"Новая запись"}
                              refetch={() => refetch()}
-                             pickedPerson={"visit-sheet"}
+                             pickedPerson={"visit-sheet-organization-contact-person"}
                              id={pickedVisit.visit_sheet_id}
                              deleteFunc={async () => {
                                  if (!role?.contract_id) return;
@@ -155,7 +208,10 @@ const RegVisitListPage = () => {
                              setPickedRow={setPickedVisit}
                              children={<RegVisitListModal
                                  type={modalType}
-                                 onClose={() => setJournalModalOpen(false)}
+                                 onClose={() => {
+                                     setPickedVisit({} as VisitSheet)
+                                     setJournalModalOpen(false)
+                                 }}
                                  isShow={JournalModalOpen}
                                  picked={pickedVisit ?? undefined}
                              />}
@@ -163,16 +219,17 @@ const RegVisitListPage = () => {
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 25 }}
+                    scroll={{ y: "58vh" }}
                     loading={isLoading}
-                    dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
+                    dataSource={filteredData && filteredData.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {
                         return (
                             <Table.Summary fixed>
                                 <Table.Summary.Row>
                                     <Table.Summary.Cell index={0}></Table.Summary.Cell>
                                     <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {data ? data.length : 0}</Table.Summary.Cell>
+                                    <Table.Summary.Cell align={"center"} index={2}>Записей: {filteredData ? filteredData.length : 0}</Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );

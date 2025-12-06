@@ -9,6 +9,7 @@ import SRDByBlockModal from "./SRDByBlockModal.tsx";
 import {roleStore} from "@/store/store.ts";
 import type {Block} from "@/types/types.ts";
 import {useDeleteBlock, useGetBlocksByContractId} from "@/services/api/blocks/blocks.ts";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const SrdByBlockPage = () => {
     document.title = "СРД по блокам";
@@ -68,7 +69,7 @@ const SrdByBlockPage = () => {
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.journal_lists)}/>
                 <span className={"font-bold"}>СРД по блокам</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader handleModalOpen={() => setIsCreateSrd(true)}

@@ -6,12 +6,14 @@ import {VisitSheet} from "./visit-sheet.model";
 import {User} from "../users/users.model";
 import {Contract} from "../contracts/contract.model";
 import {Specialist} from "../specialists/specialist.model";
+import {VisitSheetOCP} from "../visit-sheet-organization-contact-person/visit-sheet-ocp.model";
+import {OrganizationContact} from "../organization_contract_person/organisation-contact-person.model";
 
 @Module({
     controllers: [VisitSheetsController],
     providers: [VisitSheetsService],
     imports: [
-        SequelizeModule.forFeature([VisitSheet, User, Contract, Specialist])
+        SequelizeModule.forFeature([VisitSheet, User, Contract, Specialist, VisitSheetOCP, OrganizationContact])
     ],
     exports: [
         VisitSheetsService,

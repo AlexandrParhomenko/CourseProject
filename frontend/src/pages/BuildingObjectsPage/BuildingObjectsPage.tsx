@@ -101,6 +101,7 @@ const BuildingObjectsPage = () => {
           rowSelection={{type: "radio"}}
           pagination={{ position: ["bottomCenter"], defaultPageSize: 25 }}
           loading={isLoading}
+          scroll={{ y: "58vh" }}
           dataSource={data && data.map((el, idx) => ({...el, key: idx + 1}))}
           summary={() => {
             return (

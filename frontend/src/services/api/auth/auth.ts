@@ -16,7 +16,7 @@ const authApi = {
 
 export const useLogin = () => {
     return useMutation<User, Error, LoginDto>({
-        mutationFn: authApi.login,
+        mutationFn: (user) => authApi.login(user),
     });
 };
 

@@ -15,8 +15,7 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
     const [form] = Form.useForm<Consultation>();
     const {role} = roleStore();
     const {user} = useUserStore();
-    const {mutateAsync: createConsultation, isLoading} = useCreateConsultation();
-
+    const {mutateAsync: createConsultation, isPending} = useCreateConsultation();
     const onSubmit = async (values: Partial<Consultation>) => {
         if (!role?.contract_id) return;
 
@@ -27,13 +26,15 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
             result_cons: values.result_cons ?? "",
             create_row_user_id: user?.user_id,
         });
-
         form.resetFields();
         onClose();
     };
 
     return (
-        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={onClose} open={isShow}>
+        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={() => {
+            form.resetFields();
+            onClose()
+        }} open={isShow}>
             <div className={"flex items-center flex-col justify-center"}>
                 <span className={"font-bold"}>Запись реестра консультаций</span>
                 <Form
@@ -91,7 +92,7 @@ const ConsultationsModal: FC<IProps> = ({isShow, onClose}) => {
                     </div>
                     <Form.Item>
                         <Button type={"link"} className={"mr-2"} onClick={onClose}>Отменить</Button>
-                        <Button htmlType="submit" loading={isLoading}>Сохранить</Button>
+                        <Button htmlType="submit" loading={isPending}>Сохранить</Button>
                     </Form.Item>
                 </Form>
             </div>

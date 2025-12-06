@@ -1,8 +1,12 @@
 import {Button, DatePicker, Form, Input, Modal, Select} from "antd";
-import type {FC} from "react";
+import {type FC, useEffect} from "react";
 import type {ModalType, MainJournal} from "@typings/types.ts";
-import {roleStore} from "@/store/store.ts";
+import {roleStore, useUserStore} from "@/store/store.ts";
 import {useCreateMainJournal, useUpdateMainJournal} from "@/services/api/main-journal/main-journal.ts";
+import dayjs from "dayjs";
+import {useGetBrandsByContractId} from "@/services/api/brands/brands.ts";
+import {useGetAllDefects} from "@/services/api/defects/defects.ts";
+import {useGetVisitSheetsByContractId} from "@/services/api/visit-sheets/visit-sheets.ts";
 
 interface IProps {
     isShow: boolean
@@ -12,46 +16,66 @@ interface IProps {
 }
 
 const SupervisionJournalModal: FC<IProps> = ({isShow, onClose, type, picked}) => {
-    const [form] = Form.useForm<MainJournal>();
+    const [form] = Form.useForm();
     const {role} = roleStore();
+    const {user} = useUserStore();
     const {mutateAsync: createMainJournal} = useCreateMainJournal();
     const {mutateAsync: updateMainJournal} = useUpdateMainJournal();
-
-    const isUpdate = type === "update" && picked;
-
+    const {data: brands} = useGetBrandsByContractId(role?.contract_id);
+    const {data: defects} = useGetAllDefects();
+    const {data: lists} = useGetVisitSheetsByContractId(role?.contract_id);
     const onSubmit = async (values: Partial<MainJournal>) => {
         if (!role?.contract_id) return;
-
         const payload: Partial<MainJournal> = {
             contract_id: role.contract_id,
-            date_supervision: values.date_supervision!,
-            brand_id: values.brand_id!,
-            defects: values.defects ?? "",
-            instructions: values.instructions ?? "",
-            importance_defect_id: values.importance_defect_id!,
-            visit_sheet_id: values.visit_sheet_id!,
-            deadline_eliminate: values.deadline_eliminate ?? "",
-            elimination: values.elimination ?? false,
-            path_to_drawing: values.path_to_drawing ?? "",
+            date_supervision: values.date_supervision,
+            brand_id: values.brand_id,
+            defects: values.defects,
+            instructions: values.instructions,
+            importance_defect_id: values.importance_defect_id,
+            visit_sheet_id: values.visit_sheet_id,
+            deadline_eliminate: values.deadline_eliminate,
+            updated_elimination_at_true: values.updated_elimination_at_true,
+            elimination: values.elimination,
+            path_to_drawing: values.path_to_drawing,
+            create_row_user_id: user?.user_id
         };
 
-        if (isUpdate && picked) {
+        if (type === "update" && picked) {
             await updateMainJournal({main_journal_id: picked.main_journal_id, data: payload});
         } else {
             await createMainJournal(payload);
         }
-
         form.resetFields();
         onClose();
     };
 
+    useEffect(() => {
+        if (isShow && type === "update" && picked) {
+            form.setFieldsValue({
+                date_supervision: picked.date_supervision ? dayjs(picked.date_supervision) : null,
+                brand_id: picked.brand_id,
+                defects: picked.defects,
+                instructions: picked.instructions,
+                importance_defect_id: picked.importance_defect_id,
+                visit_sheet_id: picked.visit_sheet_id,
+                deadline_eliminate: picked.deadline_eliminate ? dayjs(picked.deadline_eliminate) : null,
+                updated_elimination_at_true: picked.updated_elimination_at_true ? dayjs(picked.updated_elimination_at_true) : null,
+                elimination: picked.elimination,
+                path_to_drawing: picked.path_to_drawing,
+            })
+        }
+    }, [isShow]);
+
     return (
-        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={onClose} open={isShow}>
+        <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={() => {
+            form.resetFields();
+            onClose();
+        }} open={isShow}>
             <div className={"flex items-center flex-col justify-center"}>
                 <span className={"font-bold"}>Запись журнала</span>
                 <Form
                     form={form}
-                    initialValues={picked}
                     scrollToFirstError={{
                     behavior: "smooth",
                     block: "center",
@@ -88,8 +112,10 @@ const SupervisionJournalModal: FC<IProps> = ({isShow, onClose, type, picked}) =>
                                            message: "Введите ID марки РД"
                                        }
                                    ]}
-                                   label={"ID марки РД"}>
-                            <Input type={"number"}/>
+                                   label={"Марка РД"}>
+                            <Select>
+                                {brands && brands.map((el, idx) => <Select.Option key={idx} value={el.brand_id}>{el.name_brand}</Select.Option>)}
+                            </Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
                                    name={"defects"}
@@ -118,11 +144,13 @@ const SupervisionJournalModal: FC<IProps> = ({isShow, onClose, type, picked}) =>
                                    rules={[
                                        {
                                            required: true,
-                                           message: "Введите ID значимости отступления"
+                                           message: "Введите значимость отступления"
                                        }
                                    ]}
-                                   label={"ID значимости отступления"}>
-                            <Input type={"number"}/>
+                                   label={"Значимости отступления"}>
+                            <Select>
+                                {defects && defects.map((el, idx) => <Select.Option key={idx} value={el.importance_defect_id}>{el.importance_defect}</Select.Option>)}
+                            </Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
                                    name={"visit_sheet_id"}
@@ -133,11 +161,18 @@ const SupervisionJournalModal: FC<IProps> = ({isShow, onClose, type, picked}) =>
                                        }
                                    ]}
                                    label={"ID регистрационного листа посещения"}>
-                            <Input type={"number"}/>
+                            <Select>
+                                {lists && lists.map((el, idx) => <Select.Option key={idx} value={el.visit_sheet_id}>{el.visit_sheet_id} от {dayjs(el.date_arrival).format("DD.MM.YYYY")}</Select.Option>)}
+                            </Select>
                         </Form.Item>
                         <Form.Item className={"w-full"}
                                    name={"deadline_eliminate"}
                                    label={"Срок устранения"}>
+                            <DatePicker className={"w-full"} format={"DD.MM.YYYY"}/>
+                        </Form.Item>
+                        <Form.Item className={"w-full"}
+                                   name={"updated_elimination_at_true"}
+                                   label={"Дата выполнения указаний"}>
                             <DatePicker className={"w-full"} format={"DD.MM.YYYY"}/>
                         </Form.Item>
                         <Form.Item className={"w-full"}

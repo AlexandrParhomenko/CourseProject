@@ -43,6 +43,8 @@ import {TechnicalRegistry} from "./register-technical-solutions/register-technic
 import {RegisterTechnicalSolutionsModule} from "./register-technical-solutions/register-technical-solutions.module";
 import {Registry} from "./registry/registry.model";
 import {RegistryModule} from "./registry/registry.module";
+import {VisitSheetOCP} from "./visit-sheet-organization-contact-person/visit-sheet-ocp.model";
+import {VisitSheetsOcpModule} from "./visit-sheet-organization-contact-person/visit-sheets-ocp.module";
 
 @Module({
     controllers: [],
@@ -61,7 +63,7 @@ import {RegistryModule} from "./registry/registry.module";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands, UserRoles, TypeWorks, AbbreveBrand, MainJournal, TechnicalRegistry, Registry],
+            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands, UserRoles, TypeWorks, AbbreveBrand, MainJournal, TechnicalRegistry, Registry, VisitSheetOCP],
             autoLoadModels: true
         }),
         UsersModule,
@@ -84,7 +86,8 @@ import {RegistryModule} from "./registry/registry.module";
         AbbreveBrandModule,
         MainJournalModule,
         RegisterTechnicalSolutionsModule,
-        RegistryModule
+        RegistryModule,
+        VisitSheetsOcpModule
     ],
 })
 export class AppModule {

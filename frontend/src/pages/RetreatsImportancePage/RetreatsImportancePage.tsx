@@ -8,6 +8,7 @@ import TableHeader from "../../components/TableHeader/TableHeader.tsx";
 import RetreatsImportanceModal from "./RetreatsImportanceModal.tsx";
 import type {Defect} from "@/types/types.ts";
 import {useDeleteDefect, useGetAllDefects} from "@/services/api/defects/defects.ts";
+import ExitBtn from "@components/ExitBtn/ExitBtn.tsx";
 
 const RetreatsImportancePage = () => {
     document.title = "Значимость отступления, нарушения";
@@ -51,7 +52,7 @@ const RetreatsImportancePage = () => {
             <div className={"flex justify-between w-full p-6"}>
                 <BackBtn onClick={() => navigate(routes.journal_lists)}/>
                 <span className={"font-bold"}>Значимость отступления, нарушения</span>
-                <span className={"font-bold duration-300 cursor-pointer hover:text-yellow-400"}>Выйти</span>
+                <ExitBtn/>
             </div>
             <div className={"w-full p-6"}>
                 <TableHeader pickedEntity={pickedDefect.importance_defect}
@@ -79,7 +80,8 @@ const RetreatsImportancePage = () => {
                 <Table
                     rowSelection={{type: "radio"}}
                     onRow={(record) => onRow(record)}
-                    pagination={false}
+                    pagination={{ position: ["bottomCenter"], defaultPageSize: 25 }}
+                    scroll={{ y: "58vh" }}
                     loading={isLoading}
                     dataSource={data && data.map((el, index) => ({...el, key: index + 1}))}
                     summary={() => {

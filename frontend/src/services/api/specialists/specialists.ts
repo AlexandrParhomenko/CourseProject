@@ -49,10 +49,8 @@ export const useDeleteSpecialist = () => {
     const queryClient = useQueryClient();
     return useMutation<Specialist, Error, number >({
         mutationFn: (id) => specialistsApi.delete(id),
-        onSuccess: (_, id) => {
-            if (id) {
-                queryClient.invalidateQueries({queryKey: ["specialists", id]});
-            }
+        onSuccess: (_) => {
+                queryClient.invalidateQueries({queryKey: ["specialists"]});
         }
     });
 };
