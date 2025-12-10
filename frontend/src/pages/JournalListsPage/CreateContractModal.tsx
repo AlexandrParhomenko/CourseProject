@@ -1,5 +1,7 @@
 import {Button, Form, Input, Modal} from "antd";
-import type {FC} from "react";
+import {type FC, useEffect} from "react";
+import {useCreateContract} from "@/services/api/contracts/contracts.ts";
+import {useUserStore} from "@/store/store.ts";
 
 interface IProps {
     isShow: boolean
@@ -7,9 +9,20 @@ interface IProps {
 }
 
 const CreateContractModal: FC<IProps> = ({isShow, onClose}) => {
-    const onSubmit = () => {
-
+    const {user} = useUserStore()
+    const {mutate: createContract, isPending, data} = useCreateContract()
+    const onSubmit = (values: {number_contract: string}) => {
+        createContract({
+            create_row_user_id: user?.user_id,
+            number_contract: values.number_contract
+        })
     }
+
+    useEffect(() => {
+        if (data) {
+            onClose()
+        }
+    }, [data]);
 
     return (
         <Modal width={"40%"} footer={false} destroyOnHidden centered onCancel={() => onClose()} open={isShow}>
@@ -22,7 +35,7 @@ const CreateContractModal: FC<IProps> = ({isShow, onClose}) => {
                 }} className={"flex items-center flex-col w-full"} onFinish={onSubmit}
                       layout={"vertical"}>
                     <Form.Item className={"w-full"}
-                               name={"user_login"}
+                               name={"number_contract"}
                                rules={[
                                    {
                                        required: true,
@@ -36,7 +49,7 @@ const CreateContractModal: FC<IProps> = ({isShow, onClose}) => {
                         <Button type={"link"} className={"mr-2"} onClick={() => {
                             onClose()
                         }}>Отменить</Button>
-                        <Button htmlType="submit">Сохранить</Button>
+                        <Button loading={isPending} htmlType="submit">Сохранить</Button>
                     </Form.Item>
                 </Form>
             </div>

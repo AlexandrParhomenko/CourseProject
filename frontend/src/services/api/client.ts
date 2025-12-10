@@ -35,7 +35,6 @@ export class ApiClient {
             ...options,
             headers,
         });
-
         if (response.status === 401) {
             sessionStorage.removeItem("token");
             localStorage.removeItem("token");
@@ -43,7 +42,7 @@ export class ApiClient {
             if (!endpoint.includes('/auth/login')) {
                 window.location.href = '/';
             }
-            throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
+            throw new Error(endpoint === "/auth/login" ? "Неверное имя пользователя и/или пароль" : 'Сессия истекла. Пожалуйста, войдите снова.');
         }
 
         if (!response.ok) {

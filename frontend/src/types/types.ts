@@ -5,6 +5,12 @@ export interface User {
     token: string
 }
 
+export interface Registration {
+    login: string
+    fullname: string
+    hash_password: string
+}
+
 export interface UserRole {
     user_role_id: number
     contract: {

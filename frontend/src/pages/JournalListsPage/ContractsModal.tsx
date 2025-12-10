@@ -4,6 +4,7 @@ import type {ColumnType} from "antd/es/table";
 import CreateContractModal from "./CreateContractModal.tsx";
 import SetRolesModal from "../MainPage/SetRolesModal.tsx";
 import type {ModalType} from "../../types/types.ts";
+import {useGetAllContracts} from "@/services/api/contracts/contracts.ts";
 
 interface IProps {
     isShow: boolean
@@ -14,26 +15,26 @@ const ContractsModal: FC<IProps> = ({isShow, onClose}) => {
     const [isCreateContract, setIsCreateContract] = useState<boolean>(false)
     const [isUpdateUser, setIsUpdateUser] = useState<boolean>(false)
     const [userModalType, setUserModalType] = useState<ModalType>("create")
+    const {data: contracts} = useGetAllContracts()
     const columns: ColumnType<any>[] = [
         {
             width: 100,
             align: "center",
             title: '№',
-            dataIndex: 'dr_school_sname',
-            key: 'dr_school_sname',
+            dataIndex: 'key',
+            key: 'key',
         },
         {
             align: "center",
             title: 'Номер договора',
-            dataIndex: 'phone1',
-            key: 'phone1'
+            dataIndex: 'number_contract',
+            key: 'number_contract'
         }
     ]
 
     const onRow = (record: any) => {
         return {
             onChange: () => {
-                console.log(record)
             },
             onDoubleClick: () => {
             }
@@ -56,7 +57,10 @@ const ContractsModal: FC<IProps> = ({isShow, onClose}) => {
                 <Table className={"w-full"}
                        onRow={(record) => onRow(record)}
                        pagination={false}
-                       dataSource={[]}
+                       dataSource={contracts && contracts.map((el, idx) => ({
+                           ...el,
+                           key: idx + 1
+                       }))}
                        columns={columns}/>
             </div>
         </Modal>
