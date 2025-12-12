@@ -22,8 +22,8 @@ export interface UserRole {
     user_id: number
     contract_id: number
     role_id: number
-    date_start: Date
-    date_end: Date
+    date_start: Date | string
+    date_end: Date | string
     create_row_user_id: number
     create_row_datetime: Date
     deleted: boolean
