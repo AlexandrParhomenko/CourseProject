@@ -1,0 +1,24 @@
+services:
+  # Бэкенд сервис
+  - type: web
+    name: course-project-backend
+    env: node
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start:backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false  # установите вручную в панели
+
+  # Фронтенд сервис
+  - type: web
+    name: ejan-project-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://ejan-backend.onrender.com

@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UsePipes} from '@nestjs/common';
+import {Controller, Get} from '@nestjs/common';
 import {AbbreveBrandService} from "./abbreve-brand.service";
 import {ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {AbbreveBrand} from "./abbreve-brand.model";
