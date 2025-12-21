@@ -7,8 +7,10 @@ async function start() {
     const PORT = process.env.PORT || 5000;
     const app = await NestFactory.create(AppModule)
     app.enableCors({
-        origin: 'http://localhost:5173', // ваш фронтенд порт
+        origin: ['http://localhost:5173', 'https://alexandrparhomenko.github.io'],
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     });
     const config = new DocumentBuilder()
         .setTitle('Бэкенд на nest')

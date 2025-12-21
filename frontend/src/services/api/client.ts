@@ -1,4 +1,4 @@
-import {BASE_URL} from "@/constants/constants.ts";
+import {API_KEY, BASE_URL} from "@/constants/constants.ts";
 
 export interface ApiError {
     message: string;
@@ -25,7 +25,7 @@ export class ApiClient {
             'Content-Type': 'application/json',
             ...(options.headers as Record<string, string>),
         };
-
+        headers['apikey'] = API_KEY;
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }

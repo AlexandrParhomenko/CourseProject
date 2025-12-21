@@ -63,16 +63,23 @@ import {VisitSheetsOcpModule} from "./visit-sheet-organization-contact-person/vi
             port: Number(process.env.POSTGRES_PORT),
             username: process.env.POSTGRES_USER,
             synchronize: false,
+            password: process.env.POSTGRES_PASSWORD,
+            database: process.env.POSTGRES_DB,
+            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands, UserRoles, TypeWorks, AbbreveBrand, MainJournal, TechnicalRegistry, Registry, VisitSheetOCP],
+            autoLoadModels: false,
             dialectOptions: {
                 ssl: {
                     require: true,
                     rejectUnauthorized: false
                 }
             },
-            password: process.env.POSTGRES_PASSWORD,
-            database: process.env.POSTGRES_DB,
-            models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands, UserRoles, TypeWorks, AbbreveBrand, MainJournal, TechnicalRegistry, Registry, VisitSheetOCP],
-            autoLoadModels: true
+            pool: {
+                max: 20,
+                min: 5,
+                acquire: 30000,
+                idle: 10000
+            },
+            logging: false,
         }),
         UsersModule,
         AuthModule,
