@@ -41,7 +41,7 @@ createRoot(document.getElementById('root')!).render(
                 }
             }
         }} locale={ruRU}>
-            <BrowserRouter>
+            <BrowserRouter basename="/CourseProject">
                 <App/>
             </BrowserRouter>
         </ConfigProvider>
