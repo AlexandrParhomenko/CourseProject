@@ -2,6 +2,7 @@
   "name": "ezhan",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://alexandrparhomenko.github.io/CourseProject/",
   "type": "module",
   "scripts": {
     "dev": "vite",
