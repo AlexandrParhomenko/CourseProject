@@ -58,9 +58,17 @@ import {VisitSheetsOcpModule} from "./visit-sheet-organization-contact-person/vi
         }),
         SequelizeModule.forRoot({
             dialect: 'postgres',
+            uri: process.env.DATABASE_URL,
             host: process.env.POSTGRES_HOST,
             port: Number(process.env.POSTGRES_PORT),
             username: process.env.POSTGRES_USER,
+            synchronize: false,
+            dialectOptions: {
+                ssl: {
+                    require: true,
+                    rejectUnauthorized: false
+                }
+            },
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
             models: [User, Contract, ObjectTable, Specialist, VisitSheet, Consultation, Block, Organization, OrganizationContact, Defect, TypeDocs, Discipline, Brands, UserRoles, TypeWorks, AbbreveBrand, MainJournal, TechnicalRegistry, Registry, VisitSheetOCP],

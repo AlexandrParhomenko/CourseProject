@@ -22,7 +22,7 @@ const SetRolesModal: FC<Props> = ({isShow, onClose, type}) => {
     const {data: users} = useGetUsers()
     const {mutate: createRole, data: createData} = useCreateUserRole()
     const {mutate: updateRole, data: updateData} = useUpdateUserRole()
-    const onSubmit = (values) => {
+    const onSubmit = (values: {user_id: number, contract_id: number, role_id: number, role_date: string[]}) => {
         if (type === "create") {
             createRole({
                 user_id: values.user_id,

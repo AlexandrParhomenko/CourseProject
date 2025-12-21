@@ -3,7 +3,7 @@ import {type FC, useState} from "react";
 import type {ColumnType} from "antd/es/table";
 import CreateContractModal from "./CreateContractModal.tsx";
 import SetRolesModal from "../MainPage/SetRolesModal.tsx";
-import type {ModalType} from "../../types/types.ts";
+import type {ModalType} from "@/types/types.ts";
 import {useGetAllContracts} from "@/services/api/contracts/contracts.ts";
 
 interface IProps {
@@ -32,7 +32,7 @@ const ContractsModal: FC<IProps> = ({isShow, onClose}) => {
         }
     ]
 
-    const onRow = (record: any) => {
+    const onRow = () => {
         return {
             onChange: () => {
             },
@@ -55,7 +55,7 @@ const ContractsModal: FC<IProps> = ({isShow, onClose}) => {
                     }}>Изменить администратора</Button>
                 </div>
                 <Table className={"w-full"}
-                       onRow={(record) => onRow(record)}
+                       onRow={() => onRow()}
                        pagination={false}
                        dataSource={contracts && contracts.map((el, idx) => ({
                            ...el,

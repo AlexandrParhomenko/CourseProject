@@ -6,13 +6,12 @@ import {BASE_URL} from "../constants/constants.ts";
  */
 export const apiRequest = async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
     const token = sessionStorage.getItem("token") || localStorage.getItem("token");
-    const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-    };
-
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+    const headers = new Headers(options?.headers);
+    if (!headers.has('Content-Type')) {
+        headers.set('Content-Type', 'application/json');
+    }
+    if (token && !headers.has('Authorization')) {
+        headers.set('Authorization', `Bearer ${token}`);
     }
 
     const response = await fetch(`${BASE_URL}${endpoint}`, {

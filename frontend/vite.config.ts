@@ -12,6 +12,7 @@ export default defineConfig({
       react(),
       tailwindcss()
   ],
+  base: "/AlexandrParhomenko/",
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
