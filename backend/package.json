@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "start-back-front": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
-    "build": "npx nest build",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start:backend": "cross-env NODE_ENV=production nest start",
     "start:frontend": "cd ../frontend && npm run start",
@@ -43,7 +43,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "^11.0.0",
+    "@nestjs/cli": "^11.0.14",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
     "@swc/cli": "^0.6.0",
