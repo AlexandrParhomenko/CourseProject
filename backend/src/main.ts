@@ -4,13 +4,20 @@ import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import {ValidationPipe} from "./pipes/validation.pipe";
 
 async function start() {
-    const PORT = process.env.PORT || 5000;
+    const PORT = process.env.PORT || 10000;
     const app = await NestFactory.create(AppModule)
     app.enableCors({
-        origin: ['http://localhost:5173', 'https://alexandrparhomenko.github.io'],
+        origin: ['http://localhost:5173', 'https://alexandrparhomenko.github.io', 'http://localhost:5174'],
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+        allowedHeaders: ['Content-Type',
+            'Authorization',
+            'Accept',
+            'X-Requested-With',
+            'Access-Control-Allow-Origin',
+            'Access-Control-Allow-Headers',
+            'Access-Control-Allow-Methods',
+            'Access-Control-Allow-Credentials'],
     });
     const config = new DocumentBuilder()
         .setTitle('Бэкенд на nest')
