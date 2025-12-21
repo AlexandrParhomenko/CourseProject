@@ -22,7 +22,7 @@ export class AuthService {
         if (candidate) {
             throw new HttpException('Пользователь с таким email уже существует', HttpStatus.BAD_REQUEST)
         }
-        const hashPassword = await bcrypt.hash(userDto.hash_password, 10)
+        const hashPassword = await bcrypt.hash(userDto.hash_password, 6)
         const user = await this.userService.createUser({...userDto, hash_password: hashPassword})
         return this.generateToken(user)
     }
