@@ -7,7 +7,7 @@ async function start() {
     const PORT = process.env.PORT || 10000;
     const app = await NestFactory.create(AppModule)
     app.enableCors({
-        origin: ['http://localhost:5173', 'https://alexandrparhomenko.github.io', 'http://localhost:5174'],
+        origin: ['http://localhost:5173', 'https://alexandrparhomenko.github.io', 'https://anastasia861.github.io', 'http://localhost:5174'],
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
         allowedHeaders: ['Content-Type',
