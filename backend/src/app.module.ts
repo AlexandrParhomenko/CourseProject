@@ -71,13 +71,16 @@ import {VisitSheetsOcpModule} from "./visit-sheet-organization-contact-person/vi
                 ssl: {
                     require: true,
                     rejectUnauthorized: false
-                }
+                },
+                connectTimeout: 30000,
+                keepAlive: false
             },
             pool: {
                 max: 20,
-                min: 5,
-                acquire: 30000,
-                idle: 10000
+                min: 0,
+                acquire: 90000,
+                idle: 10000,
+                evict: 15000,
             },
             logging: false,
         }),
